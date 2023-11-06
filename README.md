@@ -6,7 +6,10 @@ The event was sponsored by [H3ABioNet](https://www.h3abionet.org/).
 ## Table of Contents
 
 * [Reference-based pangenome graph building](#reference-based-pangenome-graph-building)
+  * [Constructing and viewing your first graphs](#constructing-and-viewing-your-first-graphs)
 * [Small pangenome graph building from sequence alignments](#pangenome-graph-building-from-sequence-alignments)
+  * [Building HLA pangenome graphs](#building-hla-pangenome-graphs)
+  * [Building LPA pangenome graphs](#building-lpa-pangenome-graphs)
 
 
 ## Reference-based pangenome graph building
@@ -138,7 +141,7 @@ This can be helpful to take at graphs that are too big to be directly loaded wit
 
 Make sure you have `pggb` and its tools installed.
 It is already available on the course workstations.
-If you want to build everything on your laptop, follow the instructions at the [pggb homepage](https://github.com/pangenome/pggb#installation) (`guix`, `docker`, `singularity`, and `conda` alternatives are available).
+If you want to build everything on your laptop, follow the instructions at the [pggb homepage](https://github.com/pangenome/pggb#installation).
 So make sure you have checked out `pggb` repository:
 
     cd ~
@@ -245,3 +248,5 @@ Try to make LPA pangenome graphs.
 The input sequences are in `data/LPA/LPA.fa.gz`.
 Sequences in this locus have a peculiarity: which one?
 Hint: visualize the alignments and take a look at the graph layout (with `Bandage` and/or in the `.draw_multiqc.png` files).
+
+
