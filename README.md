@@ -10,7 +10,8 @@ The event was sponsored by [H3ABioNet](https://www.h3abionet.org/).
 * [Small pangenome graph building from sequence alignments](#pangenome-graph-building-from-sequence-alignments)
   * [Building HLA pangenome graphs](#building-hla-pangenome-graphs)
   * [Building LPA pangenome graphs](#building-lpa-pangenome-graphs)
-
+* [Human pangenome graph building from sequence alignments](#human-pangenome-graph-building-from-sequence-alignments)
+* [Understanding pangenome graphs](#understanding-pangenome-graphs)
 
 ## Reference-based pangenome graph building
 
@@ -250,3 +251,47 @@ Sequences in this locus have a peculiarity: which one?
 Hint: visualize the alignments and take a look at the graph layout (with `Bandage` and/or in the `.draw_multiqc.png` files).
 
 
+## Human pangenome graph building from sequence alignments
+
+### Learning objectives
+
+- collect and preprocess *de novo* human assemblies
+- partition the assembly contigs by chromosome
+- built chromosome-specific pangenome graphs
+
+### Getting started
+
+#ToDo
+
+### Pangenome Sequence Naming
+
+#ToDo
+
+### Sequence partitioning
+
+#ToDo
+
+### Pangenome graph building
+
+#ToDo
+
+
+## Understanding pangenome graphs
+
+### Learning objectives
+
+- extract *loci* of interest from the pangenome graph
+- visualize pangenome graph annotation
+- untangle the pangenome graph
+
+### Getting started
+
+#ToDo
+
+### MHC locus
+
+#ToDo
+
+### Pangenome graph untangling
+
+#ToDo
