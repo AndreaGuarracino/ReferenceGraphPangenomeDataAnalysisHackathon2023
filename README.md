@@ -243,7 +243,7 @@ This happens because short segment lengths lead to catching shorter homologies b
 Higher values reduce sensitivity, but lead to simpler graphs.
 </details>
 
-Choose another HLA gene from the `data` folder and explore how the statistics of the resulting graph change as` s` and `p` change.
+Choose another HLA gene from the `data` folder (`A-3105.fa.gz` for example) and explore how the statistics of the resulting graph change as` s` and `p` change.
 
 ### Building LPA pangenome graphs
 
@@ -253,7 +253,9 @@ Genetic and epidemiological studies have identified lipoprotein(a) as a risk fac
 Try to make LPA pangenome graphs.
 The input sequences are in `data/LPA/LPA.fa.gz`.
 Sequences in this locus have a peculiarity: which one?
-Hint: visualize the alignments and take a look at the graph layout (with `Bandage` and/or in the `.draw_multiqc.png` files).
+Hint: visualize the alignments and take a look at the graph layout with `Bandage` and/or in the `*.draw_multiqc.png` files.
+The `*.draw_multiqc.png` files contain static representations of the graph layout.
+They are similar to what `Bandage` shows (probably a little less attractive), but such visualizations can scale to larger pangenomic graphs.
 
 
 ## Human pangenome graph building from sequence alignments
