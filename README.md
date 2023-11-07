@@ -7,11 +7,12 @@ The event was sponsored by [H3ABioNet](https://www.h3abionet.org/).
 
 * [Reference-based pangenome graph building](#reference-based-pangenome-graph-building)
   * [Constructing and viewing your first graphs](#constructing-and-viewing-your-first-graphs)
-* [Small pangenome graph building from sequence alignments](#pangenome-graph-building-from-sequence-alignments)
+* [Small pangenome graph building from sequence alignments](#small-pangenome-graph-building-from-sequence-alignments)
   * [Building HLA pangenome graphs](#building-hla-pangenome-graphs)
   * [Building LPA pangenome graphs](#building-lpa-pangenome-graphs)
 * [Human pangenome graph building from sequence alignments](#human-pangenome-graph-building-from-sequence-alignments)
 * [Understanding pangenome graphs](#understanding-pangenome-graphs)
+
 
 ## Reference-based pangenome graph building
 
@@ -132,6 +133,7 @@ This can be helpful to take at graphs that are too big to be directly loaded wit
 Now, let's build a new complex graph.
 First, take a look at `tiny/multi.vcf.gz`, which contains multiallelic variants. 
 Try to generate with that input a graph in GFA format and visualize the output with `Bandage`. What are you able to see?
+
 
 ## Small pangenome graph building from sequence alignments
 
@@ -264,15 +266,188 @@ Hint: visualize the alignments and take a look at the graph layout (with `Bandag
 
 ### Getting started
 
-#ToDo
+Create a directory to work on for this tutorial:
+
+    cd ~
+	mkdir human_pangenome_graphs
+	cd human_pangenome_graphs
+
+Download 2 human references and 4 diploid human *de novo* assemblies from the Human Pangenome Reference Consortium (HPRC) data:
+
+    mkdir -p ~/human_pangenome_graphs/assemblies
+    cd ~/human_pangenome_graphs/assemblies
+
+    wget -c https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release/references/GRCh38/GCA_000001405.15_GRCh38_no_alt_analysis_set.fasta.gz
+    wget -c https://s3-us-west-2.amazonaws.com/human-pangenomics/T2T/CHM13/assemblies/analysis_set/chm13v2.0.fa.gz
+    wget -c https://s3-us-west-2.amazonaws.com/human-pangenomics/working/HPRC/HG00438/assemblies/year1_f1_assembly_v2_genbank/HG00438.paternal.f1_assembly_v2_genbank.fa.gz
+    wget -c https://s3-us-west-2.amazonaws.com/human-pangenomics/working/HPRC/HG00438/assemblies/year1_f1_assembly_v2_genbank/HG00438.maternal.f1_assembly_v2_genbank.fa.gz
+    wget -c https://s3-us-west-2.amazonaws.com/human-pangenomics/working/HPRC/HG00621/assemblies/year1_f1_assembly_v2_genbank/HG00621.paternal.f1_assembly_v2_genbank.fa.gz
+    wget -c https://s3-us-west-2.amazonaws.com/human-pangenomics/working/HPRC/HG00621/assemblies/year1_f1_assembly_v2_genbank/HG00621.maternal.f1_assembly_v2_genbank.fa.gz
+    wget -c https://s3-us-west-2.amazonaws.com/human-pangenomics/working/HPRC/HG00673/assemblies/year1_f1_assembly_v2_genbank/HG00673.paternal.f1_assembly_v2_genbank.fa.gz
+    wget -c https://s3-us-west-2.amazonaws.com/human-pangenomics/working/HPRC/HG00673/assemblies/year1_f1_assembly_v2_genbank/HG00673.maternal.f1_assembly_v2_genbank.fa.gz
+    wget -c https://s3-us-west-2.amazonaws.com/human-pangenomics/working/HPRC_PLUS/HG00733/assemblies/year1_f1_assembly_v2_genbank/HG00733.paternal.f1_assembly_v2_genbank.fa.gz
+    wget -c https://s3-us-west-2.amazonaws.com/human-pangenomics/working/HPRC_PLUS/HG00733/assemblies/year1_f1_assembly_v2_genbank/HG00733.maternal.f1_assembly_v2_genbank.fa.gz
+
+Decompress and index the assemblies:
+
+    gunzip *genbank.fa.gz
+    ls *genbank.fa | while read f; do echo $f; samtools faidx $f; done
+
+When making pangenome graphs, you should always include at least one reference genome in order to use it as a coordinate system (for projecting variants and/or exploiting its annotations).
+We usually use both GRCh38 and CHM13.
 
 ### Pangenome Sequence Naming
 
-#ToDo
+We follow the [PanSN-spec](https://github.com/pangenome/PanSN-spec) naming to simplify the identification of samples and haplotypes in pangenomes.
+The HPRC samples already follow such a convention, but we need to apply PanSN naming to the reference genomes.
+So, let's add a prefix to their sequence names.
+We can do that by using [fastix](https://github.com/ekg/fastix):
+
+    fastix -p 'grch38#1#' <(zcat GCA_000001405.15_GRCh38_no_alt_analysis_set.fasta.gz) | bgzip -@ 16 > grch38_full.fa.gz
+    samtools faidx grch38_full.fa.gz
+    
+    fastix -p 'chm13#1#' <(zcat chm13v2.0.fa.gz) | bgzip -@ 16 > chm13.fa.gz
+    samtools faidx chm13.fa.gz
+
+About GRCh38, we remove the unplaced contigs that are (hopefully) properly represented in CHM13:
+
+    samtools faidx grch38_full.fa.gz $(cut -f 1 grch38_full.fa.gz.fai | grep -v _ ) | bgzip -@ 16 > grch38.fa.gz
+
+Cleaning:
+
+    rm chm13v2.0.fa.gz GCA_000001405.15_GRCh38_no_alt_analysis_set.fasta.gz grch38_full.fa.gz.*
+
+Take a look at how sequence names are changed in the FASTA files.
 
 ### Sequence partitioning
 
-#ToDo
+To reduce analysis complexity, we partition assembly contigs by chromosome and generate chromosome-specific pangenome graphs.
+For doing that, we first need to put the two reference genomes together
+
+    zcat chm13.fa.gz grch38.fa.gz | bgzip -@ 16 > chm13+grch38.fa.gz && samtools faidx chm13+grch38.fa.gz
+
+and then map each assembly against the two reference genomes:
+
+    DIR_BASE=~/human_pangenome_graphs
+    PATH_REFERENCES_FASTA=$DIR_BASE/assemblies/chm13+grch38.fa.gz
+
+    mkdir -p $DIR_BASE/assemblies/partitioning
+
+    ls $DIR_BASE/assemblies/*.f1_assembly_v2_genbank.fa | while read FASTA; do
+      NAME=$(basename $FASTA .fa);
+      echo $NAME
+
+      PATH_PAF=$DIR_BASE/assemblies/partitioning/$NAME.vs.ref.paf
+      wfmash $PATH_REFERENCES_FASTA $FASTA -s 10k -p 95 -N -m -t 32 > $PATH_PAF
+    done
+
+Why are we using two reference genomes? 
+
+<details>
+  <summary>Click me for the answer</summary>
+A single human genome cannot fully represent the genetic variability of the entire population.
+Having multiple reference genomes allows greater genetic variability to be represented, allowing contigs to be better partitioned.
+</details>
+
+Run `wfmash` without parameters to get information on the meaning of each parameter.
+What does `-N` mean?
+
+<details>
+  <summary>Click me for the answer</summary>
+With `-N` we ask `wfmash` to generate mappings that completely cover the assembly contigs.
+Without `-N`, mappings can only cover parts of the contigs, and different parts of the same contig could map to difference reference chromosomes.
+This is frequent for contigs belonging to acrocentric chromosomes or sex chromosomes because of their homologous regions (https://www.nature.com/articles/s41586-023-05976-y, https://doi.org/10.1093/hmg/7.13.1991).
+</details>
+
+For each haplotype (for each FASTA file), count how many contigs were partitioned in each reference chromosome.
+Which of the two references (GRCh38 and CHM13) do more contigs map to? If there is a clear winner, why?
+
+<details>
+  <summary>Click me for the answer</summary>
+CHM13 is a complete human genome (GRCh38 is almost complete, but not 100%), so we expect to be able to map more assembly contigs to it.
+</details>
+
+What chromosome do most contigs map to in GRCh38 and CHM13? and which chromosome has the least number of contigs mapped to GRCh38 and CHM13? Why?
+
+<details>
+  <summary>Click me for the answer</summary>
+In GRCh38 the shor arms of the acrocentric chromosomes (chromosome 13, 14, 15, 21 and 22) are missing, so we struggle to align acrocentric contigs to it.
+These short arms are available in CHM13 and indeed we are able to map lots of contigs against them.
+</details>
+
+It should be noted that also with `wfmash -N`, there can be cases with contigs fully mapping to different cromosomes. For example:
+
+    grep 'HG00438#1#JAHBCB010000257.1' *paf
+      HG00438.paternal.f1_assembly_v2_genbank.vs.ref.paf:HG00438#1#JAHBCB010000257.1  43636   0       43636   -       chm13#1#chr14   101161492       2782258 2825894 350     43636 25       id:f:99.6726    kc:f:0.874373
+      HG00438.paternal.f1_assembly_v2_genbank.vs.ref.paf:HG00438#1#JAHBCB010000257.1  43636   0       43636   -       chm13#1#chr22   51324926        5521798 5565434 350     43636 25       id:f:99.6726    kc:f:0.874373
+
+For which there is not enough information to determine which is the best chromosome to map against (acrocentric chromosomes are hard).
+For these case, we just randomly take one result.
+
+    DIR_BASE=~/human_pangenome_graphs
+    ls $DIR_BASE/assemblies/*.f1_assembly_v2_genbank.fa | while read FASTA; do
+      NAME=$(basename $FASTA .fa);
+      echo $NAME
+
+      PATH_PAF=$DIR_BASE/assemblies/partitioning/$NAME.vs.ref.paf
+      cut -f 1,6 $PATH_PAF | sed -e 's/chm13#1#//g' -e 's/grch38#1#//g' | awk '{
+          contig = $1;
+      
+          # If the contig is not already in the data array, add it
+          if (!(contig in data)) {
+              data[contig] = $2;
+          }
+      }
+      END {
+        # Output the result
+        for (contig in data) {
+          print contig "\t" data[contig];
+        }
+      }' > $DIR_BASE/assemblies/partitioning/$NAME.vs.ref.assignments.tsv
+    done
+
+Now we can subset assembly contigs by chromosome:
+
+    DIR_BASE=~/human_pangenome_graphs
+    ( seq 1 22; echo X; echo Y ) | while read i; do
+      echo chr$i
+      
+      grep chr$i --no-filename -w $DIR_BASE/assemblies/partitioning/*.assignments.tsv | cut -f 1 > $DIR_BASE/assemblies/partitioning/chr$i.contigs.txt
+    done
+
+Then, we create a FASTA file for each chromosome, reference chromosomes included.
+To save time and space, let's take only sequences from chromosome 20:
+
+    DIR_BASE=~/human_pangenome_graphs
+    ( echo 20 ) | while read i; do
+      echo chr$i
+      samtools faidx $DIR_BASE/assemblies/chm13+grch38.fa.gz chm13#1#chr$i grch38#1#chr$i > $DIR_BASE/assemblies/partitioning/chr$i.fa
+      
+      ls $DIR_BASE/assemblies/*.f1_assembly_v2_genbank.fa | while read FASTA; do
+        NAME=$(basename $FASTA .fa);
+        echo $NAME
+
+        samtools faidx $FASTA $( comm -12 <(cut -f 1 $FASTA.fai | sort) <(sort $DIR_BASE/assemblies/partitioning/chr$i.contigs.txt) ) >> $DIR_BASE/assemblies/partitioning/chr$i.fa
+      done
+
+      bgzip -@ 16 $DIR_BASE/assemblies/partitioning/chr$i.fa
+      samtools faidx  $DIR_BASE/assemblies/partitioning/chr$i.fa.gz
+    done
+
+Check that everything went fine:
+
+    head $DIR_BASE/assemblies/partitioning/chr20.fa.gz.fai
+      chm13#1#chr20   66210255        15      60      61
+      grch38#1#chr20  64444167        67313791        60      61
+      HG00438#2#JAHBCA010000018.1     36199104        132832057       60      61
+      HG00438#2#JAHBCA010000074.1     688514  169634509       60      61
+      HG00438#2#JAHBCA010000089.1     29856295        170334528       60      61
+      HG00438#2#JAHBCA010000131.1     448468  200688457       60      61
+      HG00438#2#JAHBCA010000161.1     865084  201144429       60      61
+      HG00438#2#JAHBCA010000193.1     130419  202023961       60      61
+      HG00438#2#JAHBCA010000210.1     103918  202156583       60      61
+      HG00438#1#JAHBCB010000023.1     26194192        202262262       60      61
+
 
 ### Pangenome graph building
 
