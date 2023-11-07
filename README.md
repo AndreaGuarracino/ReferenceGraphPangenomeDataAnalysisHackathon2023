@@ -451,25 +451,56 @@ Check that everything went fine:
 
 ### Pangenome graph building
 
-#ToDo
+Build the pangenome graph for chromosome 20.
 
+    DIR_BASE=~/human_pangenome_graphs
+    mkdir -p $DIR_BASE/graphs
+    cd $DIR_BASE/graphs
 
-## Understanding pangenome graphs
+    pggb -i $DIR_BASE/assemblies/partitioning/chr20.fa.gz -o $DIR_BASE/graphs/pggb.chr20 -p 98 -k 79 -t 32 -D /scratch
 
-### Learning objectives
+**IMPORTANT**: The `-D` parameter in `pggb` is used to specify the directory used for temporary files.
+This directory should be on a high-speed disk (like an SSD) to avoid severe slowdowns during graph construction.
 
-- extract *loci* of interest from the pangenome graph
-- visualize pangenome graph annotation
-- untangle the pangenome graph
+Note that we are not specifying the number of haplotypes (`-n` parameter).
+Indeed, `pggb` can automatically obtain this information thanks to the fact that the input sequences respect the PanSN naming.
 
-### Getting started
+Since human presents a low sequence divergence, we will set the mapping identity (`-p` parameter) in `pggb` to `98`.
+Additionally, we specify `-s 10k` to get a simpler and more linear graph structure, which is easier to work with.
 
-#ToDo
+The `-k` parameter is used to filter exact matches shorter than 79 bps.
+Graph induction with `seqwish` often works better when we filter very short matches out of the input alignments.
+In practice, these often occur in regions of low alignment quality, which are typical of areas with large indels and structural variations in the `wfmash` alignments.
+This underalignment is then resolved in the final `smoothxg` step.
+Removing short matches can simplify the graph and remove spurious relationships caused by short repeated homologies.
+By default, `pggb` uses `-k 23`.
+With human data, higher values work well.
 
-### MHC locus
+Use `odgi stats` to obtain the graph length, and the number of nodes, edges, and paths.
+Do you think the resulting pangenome graph represents the input sequences well?
+Check the length and the number of the input sequences to answer this question.
 
-#ToDo
+<details>
+  <summary>Click me for the answer</summary>
+chr20 is approximately 64-66 Mbp long in reference genomes.
+There is no right value because it always depends on how much genetic variability we want to represent in the graph.
+Lower `-s` and `-p` values will tend to represent more homologies, getting shorter, but more complex, graphs.
+</details>
 
-### Pangenome graph untangling
+Take a look at the PNG files in the `pggb.chr20` folder. Is the layout of the graph roughly linear?
 
-#ToDo
+Generate another `odgi viz` visualization with
+
+    cd $DIR_BASE/graphs/pggb.chr20
+    odgi paths -i chr20.fa.gz.a8a102b.c2fac19.afc7f52.smooth.final.og -L | cut -f 1,2 -d '#' | uniq > prefixes.txt
+    odgi viz -i chr20.fa.gz.a8a102b.c2fac19.afc7f52.smooth.final.og -o chr20.fa.gz.a8a102b.c2fac19.afc7f52.smooth.final.og.viz_multiqc.2.png -x 1500 -y 500 -a 10 -I Consensus_ -M prefixes.txt
+
+What do you think is different between the `chr20.fa.gz.a8a102b.c2fac19.afc7f52.smooth.final.og.viz_multiqc.png` image 
+and the newly generated image (`chr20.fa.gz.a8a102b.c2fac19.afc7f52.smooth.final.og.viz_multiqc.2.png`)?
+
+<details>
+  <summary>Click me for the answer</summary>
+
+The contigs of the two additional haplotypes are visually collapsed into one path each.
+</details>
+</br>
