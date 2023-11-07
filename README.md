@@ -112,8 +112,8 @@ Download the graph on your computer and try to visualize it locally with:
     ./BandageNG-9eb84c2-x86_64.AppImage load tiny.gfa 
 
 Click the `Drawn graph` button to visualize the graph.
-
-Select the longest node (it is in the middle) by clicking on it, then click the `Paths...` button to see the paths that pass through the selected node.
+Click the 'Length Node' button under Node labels feature.
+Select the longest node (it is in the middle, 19 bp) by clicking on it, then click the `Paths...` button to see the paths that pass through the selected node.
 Check that the paths displayed are the same as you expect by checking the GFA. Any problems?
 
 <details>
@@ -129,6 +129,9 @@ Never trust the tools!
 Try to generate a PNG image with `Bandage` (take a look at the `BandageNG-9eb84c2-x86_64.AppImage -h` output).
 This can be helpful to take at graphs that are too big to be directly loaded with `Bandage`.
 
+Now, let's build a new complex graph.
+First, take a look at `tiny/multi.vcf.gz`, which contains multiallelic variants. 
+Try to generate with that input a graph in GFA format and visualize the output with `Bandage`. What are you able to see?
 
 ## Small pangenome graph building from sequence alignments
 
