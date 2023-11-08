@@ -173,8 +173,6 @@ Let's build a pangenome graph from a collection of sequences of the DRB1-3123 ge
 
     pggb -i data/HLA/DRB1-3123.fa.gz -o out_DRB1_3123.1 -n 12
 
-Take a look at the files in the `out_DRB1_3123.1` folder. Visualize the graph with `Bandage`.
-
 Why did we specify `-n 12`?
 
 <details>
@@ -192,6 +190,30 @@ How many pairwise alignments were used to build the graph (take a look at the `P
 The last command will generate a `out.png` file with a visualization of the alignments.
 Purple lines indicate that the 2 sequences are aligned in the same orientation.
 Blue lines indicate that the 2 sequences are aligned in different orientation.
+
+Take a look at the files in the `out_DRB1_3123.1` folder.
+
+- `*.alignments.wfmash.paf`: sequence alignments;
+- `*.log`: whole log;
+- `*.params.yml`: `pggb`'s parameters in `YAML` format;
+- `*.gfa`: final pangenome graph in GFA format;
+- `*.og`: final pangenome graph in ODGI format (used in `odgi`);
+- `*.lay`: graph layout in `LAY` format (used in `odgi`);
+- `*.draw_multiqc.png`: static graph layout representation with sequences as colored lines;
+- `*.draw.png`: static graph layout representation;
+- `*.lay.tsv`: graph layout in `TSV` format;
+
+
+`*.viz_*.png` images represent the graph in 1 dimension, with sequences represented as colored bars and graph links represented as black lines at the bottom.
+Each image follow a different color scheme:
+- `*.viz_multiqc.png`: each path has a different color, without any meaning;
+- `*.viz_depth_multiqc.png`: paths are colored by depth. We define **node depth in a path** as the number of times the node is crossed by a path; 
+- `*.viz_inv_multiqc.png`: paths are colored with respect to the strandness (black for forward, red for reverse);
+- `*.viz_O_multiqc.png`: all paths are compressed into a single line, where we color by path coverage;
+- `.viz_pos_multiqc.png`: paths are colored with respect to the node position in each path. Smooth color gradients highlight well-sorted graphs.
+- `*.viz_uncalled_multiqc.png`: uncalled bases (`Ns`) are colored in green.
+
+Try to visualize the graph also with `Bandage`.
 
 Use `odgi stats` to obtain the graph length, and the number of nodes, edges, and paths:
 
@@ -301,7 +323,7 @@ We usually use both GRCh38 and CHM13.
 ### Pangenome Sequence Naming
 
 We follow the [PanSN-spec](https://github.com/pangenome/PanSN-spec) naming to simplify the identification of samples and haplotypes in pangenomes.
-The HPRC samples already follow such a convention, but we need to apply PanSN naming to the reference genomes.
+The HPRC samples already follow such a convention (`1` is the PATERNAL haplotype, `2` is the MATERNAL haplotype), but we need to apply PanSN naming to the reference genomes.
 So, let's add a prefix to their sequence names.
 We can do that by using [fastix](https://github.com/ekg/fastix):
 
@@ -340,8 +362,10 @@ and then map each assembly against the two reference genomes:
       echo $NAME
 
       PATH_PAF=$DIR_BASE/assemblies/partitioning/$NAME.vs.ref.paf
-      wfmash $PATH_REFERENCES_FASTA $FASTA -s 10k -p 95 -N -m -t 32 > $PATH_PAF
+      wfmash $PATH_REFERENCES_FASTA $FASTA -m -N -t 32 > $PATH_PAF
     done
+
+`wfmash` should take 4-5 minutes for each haplotype (each FASTA file).
 
 Why are we using two reference genomes? 
 
@@ -351,7 +375,19 @@ A single human genome cannot fully represent the genetic variability of the enti
 Having multiple reference genomes allows greater genetic variability to be represented, allowing contigs to be better partitioned.
 </details>
 
+Recently, a new high-quality human diploid assembly was released at [HG002](https://github.com/marbl/HG002).
+You could also try using these 2 new haplotypes (`HG002#MATERNAL` and `HG002#PATERNAL`) to partition assembly contigs and see if you can partition more.
+
 Run `wfmash` without parameters to get information on the meaning of each parameter.
+
+What does `-m` mean?
+
+<details>
+  <summary>Click me for the answer</summary>
+We ask `wfmash` to compute only the mapping, not the alignment, to save computation time.
+To partition chromosomes, we don't need the base-level alignments.
+</details>
+
 What does `-N` mean?
 
 <details>
@@ -379,9 +415,9 @@ These short arms are available in CHM13 and indeed we are able to map lots of co
 
 It should be noted that also with `wfmash -N`, there can be cases with contigs fully mapping to different cromosomes. For example:
 
-    grep 'HG00438#1#JAHBCB010000257.1' *paf
-      HG00438.paternal.f1_assembly_v2_genbank.vs.ref.paf:HG00438#1#JAHBCB010000257.1  43636   0       43636   -       chm13#1#chr14   101161492       2782258 2825894 350     43636 25       id:f:99.6726    kc:f:0.874373
-      HG00438.paternal.f1_assembly_v2_genbank.vs.ref.paf:HG00438#1#JAHBCB010000257.1  43636   0       43636   -       chm13#1#chr22   51324926        5521798 5565434 350     43636 25       id:f:99.6726    kc:f:0.874373
+    grep 'HG00438#2#JAHBCA010000147.1' *paf
+      HG00438.maternal.f1_assembly_v2_genbank.vs.ref.paf:HG00438#2#JAHBCA010000147.1  738336  0       738336  +       chm13#1#chr13 113566686       8582789 9321125 245     738336  23      id:f:99.4899    kc:f:0.057824
+      HG00438.maternal.f1_assembly_v2_genbank.vs.ref.paf:HG00438#2#JAHBCA010000147.1  738336  0       738336  +       chm13#1#chr22 51324926        5299094 6037430 245     738336  23      id:f:99.4899    kc:f:0.057824
 
 For which there is not enough information to determine which is the best chromosome to map against (acrocentric chromosomes are hard).
 For these case, we just randomly take one result.
@@ -433,23 +469,22 @@ To save time and space, let's take only sequences from chromosome 20:
       done
 
       bgzip -@ 16 $DIR_BASE/assemblies/partitioning/chr$i.fa
-      samtools faidx  $DIR_BASE/assemblies/partitioning/chr$i.fa.gz
+      samtools faidx $DIR_BASE/assemblies/partitioning/chr$i.fa.gz
     done
 
 Check that everything went fine:
 
-    head $DIR_BASE/assemblies/partitioning/chr20.fa.gz.fai
-      chm13#1#chr20   66210255        15      60      61
-      grch38#1#chr20  64444167        67313791        60      61
-      HG00438#2#JAHBCA010000018.1     36199104        132832057       60      61
-      HG00438#2#JAHBCA010000074.1     688514  169634509       60      61
-      HG00438#2#JAHBCA010000089.1     29856295        170334528       60      61
-      HG00438#2#JAHBCA010000131.1     448468  200688457       60      61
-      HG00438#2#JAHBCA010000161.1     865084  201144429       60      61
-      HG00438#2#JAHBCA010000193.1     130419  202023961       60      61
-      HG00438#2#JAHBCA010000210.1     103918  202156583       60      61
-      HG00438#1#JAHBCB010000023.1     26194192        202262262       60      61
-
+    head $DIR_BASE/assemblies/partitioning/chr20.fa.gz.fai | column -t
+      chm13#1#chr20                66210255  15         60  61
+      grch38#1#chr20               64444167  67313791   60  61
+      HG00438#2#JAHBCA010000018.1  36199104  132832057  60  61
+      HG00438#2#JAHBCA010000074.1  688514    169634509  60  61
+      HG00438#2#JAHBCA010000089.1  29856295  170334528  60  61
+      HG00438#2#JAHBCA010000131.1  448468    200688457  60  61
+      HG00438#2#JAHBCA010000161.1  865084    201144429  60  61
+      HG00438#2#JAHBCA010000193.1  130419    202023961  60  61
+      HG00438#2#JAHBCA010000210.1  103918    202156583  60  61
+      HG00438#1#JAHBCB010000023.1  26194192  202262262  60  61
 
 ### Pangenome graph building
 
@@ -459,7 +494,9 @@ Build the pangenome graph for chromosome 20.
     mkdir -p $DIR_BASE/graphs
     cd $DIR_BASE/graphs
 
-    pggb -i $DIR_BASE/assemblies/partitioning/chr20.fa.gz -o $DIR_BASE/graphs/pggb.chr20 -p 98 -k 79 -t 32 -D /scratch
+    pggb -i $DIR_BASE/assemblies/partitioning/chr20.fa.gz -o $DIR_BASE/graphs/pggb.chr20 -p 98 -k 49 -D /scratch -t 32
+
+This should take less than 1 hour.
 
 **IMPORTANT**: The `-D` parameter in `pggb` is used to specify the directory used for temporary files.
 This directory should be on a high-speed disk (like an SSD) to avoid severe slowdowns during graph construction.
@@ -467,14 +504,15 @@ This directory should be on a high-speed disk (like an SSD) to avoid severe slow
 Note that we are not specifying the number of haplotypes (`-n` parameter).
 Indeed, `pggb` can automatically obtain this information thanks to the fact that the input sequences respect the PanSN naming.
 
-Since human presents a low sequence divergence, we will set the mapping identity (`-p` parameter) in `pggb` to `98`.
+Since human presents a low sequence divergence, we set the mapping identity (`-p` parameter) in `pggb` to `98`.
 Additionally, we specify `-s 10k` to get a simpler and more linear graph structure, which is easier to work with.
+Lower values lead to more sensitive mappings but to the possibility of having circular graphs due to the similarity of the telomeres.
 
-The `-k` parameter is used to filter exact matches shorter than 79 bps.
-Graph induction with `seqwish` often works better when we filter very short matches out of the input alignments.
-In practice, these often occur in regions of low alignment quality, which are typical of areas with large indels and structural variations in the `wfmash` alignments.
-This underalignment is then resolved in the final `smoothxg` step.
+The `-k` parameter is used to filter exact matches in the sequence alignments shorter than 49 bps.
+Indeed, graph induction with `seqwish` often works better when we filter short matches out of the input alignments.
+In practice, these often occur in regions of low alignment quality, which are typical of areas with large indels and structural variations.
 Removing short matches can simplify the graph and remove spurious relationships caused by short repeated homologies.
+However, this filter might lead to under-alignment, that is resolved in the graph normalization step with `smoothxg`.
 By default, `pggb` uses `-k 23`.
 With human data, higher values work well.
 
@@ -495,7 +533,7 @@ Generate another `odgi viz` visualization with
 
     cd $DIR_BASE/graphs/pggb.chr20
     odgi paths -i chr20.fa.gz.a8a102b.c2fac19.afc7f52.smooth.final.og -L | cut -f 1,2 -d '#' | uniq > prefixes.txt
-    odgi viz -i chr20.fa.gz.a8a102b.c2fac19.afc7f52.smooth.final.og -o chr20.fa.gz.a8a102b.c2fac19.afc7f52.smooth.final.og.viz_multiqc.2.png -x 1500 -y 500 -a 10 -I Consensus_ -M prefixes.txt
+    odgi viz -i chr20.fa.gz.a8a102b.c2fac19.afc7f52.smooth.final.og -o chr20.fa.gz.a8a102b.c2fac19.afc7f52.smooth.final.og.viz_multiqc.2.png -x 1500 -y 500 -a 10 -M prefixes.txt
 
 What do you think is different between the `chr20.fa.gz.a8a102b.c2fac19.afc7f52.smooth.final.og.viz_multiqc.png` image 
 and the newly generated image (`chr20.fa.gz.a8a102b.c2fac19.afc7f52.smooth.final.og.viz_multiqc.2.png`)?
