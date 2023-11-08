@@ -501,7 +501,7 @@ Build the pangenome graph for chromosome 20.
     mkdir -p $DIR_BASE/graphs
     cd $DIR_BASE/graphs
 
-    pggb -i $DIR_BASE/assemblies/partitioning/chr20.fa.gz -o $DIR_BASE/graphs/pggb.chr20 -p 98 -k 49 -D /scratch -t 32
+    pggb -i $DIR_BASE/assemblies/partitioning/chr20.fa.gz -o $DIR_BASE/graphs/pggb.chr20 -p 98 -k 79 -D /scratch -t 32
 
 This should take less than 1 hour.
 
@@ -515,7 +515,7 @@ Since human presents a low sequence divergence, we set the mapping identity (`-p
 Additionally, we specify `-s 10k` to get a simpler and more linear graph structure, which is easier to work with.
 Lower values lead to more sensitive mappings but to the possibility of having circular graphs due to the similarity of the telomeres.
 
-The `-k` parameter is used to filter exact matches in the sequence alignments shorter than 49 bps.
+The `-k` parameter is used to filter exact matches in the sequence alignments shorter than 79 bps.
 Indeed, graph induction with `seqwish` often works better when we filter short matches out of the input alignments.
 In practice, these often occur in regions of low alignment quality, which are typical of areas with large indels and structural variations.
 Removing short matches can simplify the graph and remove spurious relationships caused by short repeated homologies.
