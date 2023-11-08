@@ -27,13 +27,13 @@ The event was sponsored by [H3ABioNet](https://www.h3abionet.org/).
 
 - construct graphs using `vg construct`
 - visualize graphs using `vg view` and `Bandage`
-- convert graphs using `vg convert`
+- convert graphs using `vg view`
 
 ### Getting started
 
 Make sure you have `vg` installed.
 It is already available on the course workstations.
-In this exercise, you will use small toy examples from the `test` directory.
+In this exercise, you will use small toy examples from the `test` directory of `vg`.
 So make sure you have checked out `vg` repository:
 
     cd ~
@@ -69,7 +69,28 @@ The `-m` option tells `vg` to put at most 32 characters into each graph node.
 To visualize a graph, you can use `vg view`.
 By default, `vg view` will output a graph in [GFA](https://github.com/GFA-spec/GFA-spec/blob/master/GFA1.md) format.
 
-	vg view tiny.ref.vg
+	vg view tiny.ref.vg | column -t
+      H  VN:Z:1.1                                          
+      S  1         CAAATAAGGCTTGGAAATTTTCTGGAGTTCTA        
+      S  2         TTATATTCCAACTCTCTG                      
+      P  x         1+,2+                             *
+      L  1         +                                 2  +  0M
+
+In GFA format, each line is a separate record of some part of the graph.
+The lines come in several types, which are indicated by the first character of the line.
+What do you think they indicate?
+
+<details>
+  <summary>Click me for the answers</summary>
+
+In a GFA file there are these following line types:
+- `H`: a header.
+- `S`: a "sequence" line, which is the sequence and ID of a node in the graph.
+- `L`: a "link" line, which is an edge in the graph.
+- `P`: a "path" line, which labels a path of interest in the graph. In this case, the path is the walk that the reference sequence takes through the graph.
+
+Of note, the format does not specify that these lines come in a particular order.
+</details>
 
 Try to run `vf construct` with different values of `-m` and observe the different results.
 
@@ -77,12 +98,12 @@ Now let's build a new graph that has some variants built into it.
 First, take a look at `tiny/tiny.vcf.gz`, which contains variants in (gzipped) [VCF](https://samtools.github.io/hts-specs/VCFv4.2.pdf) format.
 
     zgrep '^##' -v tiny/tiny.vcf.gz | column -t
-    #CHROM  POS  ID  REF  ALT  QUAL  FILTER  INFO                           FORMAT  1
-    x       9    .   G    A    99    .       AC=1;LEN=1;NA=1;NS=1;TYPE=snp  GT      1|0
-    x       10   .   C    T    99    .       AC=2;LEN=1;NA=1;NS=1;TYPE=snp  GT      1|1
-    x       14   .   G    A    99    .       AC=1;LEN=1;NA=1;NS=1;TYPE=snp  GT      1|0
-    x       34   .   T    A    99    .       AC=2;LEN=1;NA=1;NS=1;TYPE=snp  GT      1|1
-    x       39   .   T    A    99    .       AC=1;LEN=1;NA=1;NS=1;TYPE=snp  GT      1|0
+      #CHROM  POS  ID  REF  ALT  QUAL  FILTER  INFO                           FORMAT  1
+      x       9    .   G    A    99    .       AC=1;LEN=1;NA=1;NS=1;TYPE=snp  GT      1|0
+      x       10   .   C    T    99    .       AC=2;LEN=1;NA=1;NS=1;TYPE=snp  GT      1|1
+      x       14   .   G    A    99    .       AC=1;LEN=1;NA=1;NS=1;TYPE=snp  GT      1|0
+      x       34   .   T    A    99    .       AC=2;LEN=1;NA=1;NS=1;TYPE=snp  GT      1|1
+      x       39   .   T    A    99    .       AC=1;LEN=1;NA=1;NS=1;TYPE=snp  GT      1|0
 
 then use `vg construct` to build the graph:
 
@@ -92,35 +113,19 @@ We can write the graph in [GFA](https://github.com/GFA-spec/GFA-spec/blob/master
 
     vg view tiny.vg > tiny.gfa
 
-In GFA format, each line is a separate record of some part of the graph.
-The lines come in several types, which are indicated by the first character of the line.
-What line types do you see? What do you think they indicate?
-
-<details>
-  <summary>Click me for the answers</summary>
-
-You should see the following line types:
-- `H`: a header.
-- `S`: a "sequence" line, which is the sequence and ID of a node in the graph.
-- `L`: a "link" line, which is an edge in the graph.
-- `P`: a "path" line, which labels a path of interest in the graph. In this case, the path is the walk that the reference sequence takes through the graph.
-
-Of note, the format does not specify that these lines come in a particular order.
-</details>
-
-A for visualizing (not too big) pangenome graphs is [BandageNG](https://github.com/asl/BandageNG).
+A tool for visualizing (not too big) pangenome graphs is [BandageNG](https://github.com/asl/BandageNG).
 It supports graphs in GFA format.
-To use Bandage, just:
+To use Bandage, just download it locally on your computer:
 
     wget -c https://github.com/asl/BandageNG/releases/download/v2022.09/BandageNG-9eb84c2-x86_64.AppImage
     chmod +x BandageNG-9eb84c2-x86_64.AppImage
 
-Download the graph on your computer and try to visualize it locally with:
+Then download the graph on your computer and try to visualize it locally with:
 
     ./BandageNG-9eb84c2-x86_64.AppImage load tiny.gfa 
 
 Click the `Drawn graph` button to visualize the graph.
-Click the 'Length Node' button under Node labels feature.
+Click the `Length Node` button under Node labels feature.
 Select the longest node (it is in the middle, 19 bp) by clicking on it, then click the `Paths...` button to see the paths that pass through the selected node.
 Check that the paths displayed are the same as you expect by checking the GFA. Any problems?
 
@@ -195,8 +200,16 @@ How many pairwise alignments were used to build the graph (take a look at the `P
     ~/wfmash/scripts/paf2dotplot png large *paf
 
 The last command will generate a `out.png` file with a visualization of the alignments.
+
+![out_DRB1_3123.1 alignment](images/out.png)
+
 Purple lines indicate that the 2 sequences are aligned in the same orientation.
 Blue lines indicate that the 2 sequences are aligned in different orientation.
+
+If `paf2dotplot` does not work, you can use [pafplot](https://github.com/ekg/pafplot) to visualize the alignment.
+Its outputs are less appealing, but can scale on big alignments.
+
+![out_DRB1_3123.1 alignment.pafplot](images/DRB1-3123.fa.gz.bf3285f.alignments.wfmash.paf.png)
 
 Take a look at the files in the `out_DRB1_3123.1` folder.
 
@@ -206,19 +219,19 @@ Take a look at the files in the `out_DRB1_3123.1` folder.
 - `*.gfa`: final pangenome graph in GFA format;
 - `*.og`: final pangenome graph in ODGI format (used in `odgi`);
 - `*.lay`: graph layout in `LAY` format (used in `odgi`);
-- `*.draw_multiqc.png`: static graph layout representation with sequences as colored lines;
-- `*.draw.png`: static graph layout representation;
 - `*.lay.tsv`: graph layout in `TSV` format;
+- `*.draw.png`: static graph layout representation;
+- `*.draw_multiqc.png`: static graph layout representation with sequences as colored lines;
 
-
-`*.viz_*.png` images represent the graph in 1 dimension, with sequences represented as colored bars and graph links represented as black lines at the bottom.
+The `*.viz_*.png` images represent the graph in 1 dimension: all nodes are on the horizontal axis, from left to right, 
+the sequences are represented as colored bars and the graph links are represented as black lines at the bottom of the paths.
 Each image follow a different color scheme:
 - `*.viz_multiqc.png`: each path has a different color, without any meaning;
 - `*.viz_depth_multiqc.png`: paths are colored by depth. We define **node depth in a path** as the number of times the node is crossed by a path; 
 - `*.viz_inv_multiqc.png`: paths are colored with respect to the strandness (black for forward, red for reverse);
-- `*.viz_O_multiqc.png`: all paths are compressed into a single line, where we color by path coverage;
-- `.viz_pos_multiqc.png`: paths are colored with respect to the node position in each path. Smooth color gradients highlight well-sorted graphs.
-- `*.viz_uncalled_multiqc.png`: uncalled bases (`Ns`) are colored in green.
+- `.viz_pos_multiqc.png`: paths are colored with respect to the node position in each path. Smooth color gradients highlight well-sorted graphs;
+- `*.viz_uncalled_multiqc.png`: uncalled bases (`Ns`) are colored in green;
+- `*.viz_O_multiqc.png`: all paths are compressed into a single line, where we color by path coverage.
 
 Try to visualize the graph also with `Bandage`.
 
@@ -266,8 +279,10 @@ How is this affecting graph statistics?
 
 <details>
   <summary>Click me for the answer</summary>
+
 This parameter influences the sensitivity in detecting structural variants (SVs) and inversions.
-Lower values lead to better resolution of SVs breakpoints and the possibility of detecting shorter inversions, but at the same time increase the complexity of the graph in terms of the number of nodes and edges.
+Lower values lead to better resolution of SVs breakpoints and the possibility of detecting shorter inversions, 
+but at the same time increase the complexity of the graph in terms of the number of nodes and edges.
 This happens because short segment lengths lead to catching shorter homologies between the input sequences (that is, more mappings and then alignments).
 Higher values reduce sensitivity, but lead to simpler graphs.
 </details>
@@ -284,7 +299,7 @@ The input sequences are in `data/LPA/LPA.fa.gz`.
 Sequences in this locus have a peculiarity: which one?
 Hint: visualize the alignments and take a look at the graph layout with `Bandage` and/or in the `*.draw_multiqc.png` files.
 The `*.draw_multiqc.png` files contain static representations of the graph layout.
-They are similar to what `Bandage` shows (probably a little less attractive), but such visualizations can scale to larger pangenomic graphs.
+They are similar to what `Bandage` shows, probably a little less attractive, but such visualizations can scale to larger pangenomic graphs.
 
 
 ## Human pangenome graph building from sequence alignments
@@ -378,12 +393,14 @@ Why are we using two reference genomes?
 
 <details>
   <summary>Click me for the answer</summary>
+
 A single human genome cannot fully represent the genetic variability of the entire population.
 Having multiple reference genomes allows greater genetic variability to be represented, allowing contigs to be better partitioned.
 </details>
 
 Recently, a new high-quality human diploid assembly was released at [HG002](https://github.com/marbl/HG002).
-You could also try using these 2 new haplotypes (`HG002#MATERNAL` and `HG002#PATERNAL`) to partition assembly contigs and see if you can partition more.
+You could also try using these 2 new haplotypes (`HG002#MATERNAL` and `HG002#PATERNAL`) to partition assembly contigs and see if you can partition more
+(_we haven't seriously tried it yet, so we're very curious how much this new diploid assembly can help with the chromosome partitioning_).
 
 Run `wfmash` without parameters to get information on the meaning of each parameter.
 
@@ -391,6 +408,7 @@ What does `-m` mean?
 
 <details>
   <summary>Click me for the answer</summary>
+
 We ask `wfmash` to compute only the mapping, not the alignment, to save computation time.
 To partition chromosomes, we don't need the base-level alignments.
 </details>
@@ -399,6 +417,7 @@ What does `-N` mean?
 
 <details>
   <summary>Click me for the answer</summary>
+
 With `-N` we ask `wfmash` to generate mappings that completely cover the assembly contigs.
 Without `-N`, mappings can only cover parts of the contigs, and different parts of the same contig could map to difference reference chromosomes.
 This is frequent for contigs belonging to acrocentric chromosomes or sex chromosomes because of their homologous regions (https://www.nature.com/articles/s41586-023-05976-y, https://doi.org/10.1093/hmg/7.13.1991).
@@ -409,6 +428,7 @@ Which of the two references (GRCh38 and CHM13) do more contigs map to? If there 
 
 <details>
   <summary>Click me for the answer</summary>
+
 CHM13 is a complete human genome (GRCh38 is almost complete, but not 100%), so we expect to be able to map more assembly contigs to it.
 </details>
 
@@ -416,6 +436,7 @@ What chromosome do most contigs map to in GRCh38 and CHM13? and which chromosome
 
 <details>
   <summary>Click me for the answer</summary>
+
 In GRCh38 the shor arms of the acrocentric chromosomes (chromosome 13, 14, 15, 21 and 22) are missing, so we struggle to align acrocentric contigs to it.
 These short arms are available in CHM13 and indeed we are able to map lots of contigs against them.
 </details>
@@ -426,8 +447,8 @@ It should be noted that also with `wfmash -N`, there can be cases with contigs f
       HG00438.maternal.f1_assembly_v2_genbank.vs.ref.paf:HG00438#2#JAHBCA010000147.1  738336  0       738336  +       chm13#1#chr13 113566686       8582789 9321125 245     738336  23      id:f:99.4899    kc:f:0.057824
       HG00438.maternal.f1_assembly_v2_genbank.vs.ref.paf:HG00438#2#JAHBCA010000147.1  738336  0       738336  +       chm13#1#chr22 51324926        5299094 6037430 245     738336  23      id:f:99.4899    kc:f:0.057824
 
-For which there is not enough information to determine which is the best chromosome to map against (acrocentric chromosomes are hard).
-For these case, we just randomly take one result.
+For which there is not enough information to determine which is the best chromosome to map against (_acrocentric chromosomes are hard!_).
+For these case, we just randomly take one result (_we are working on implementing the random sampling directly in `wfmash`_, to make user life easier).
 
     DIR_BASE=~/human_pangenome_graphs
     ls $DIR_BASE/assemblies/*.f1_assembly_v2_genbank.fa | while read FASTA; do
@@ -501,19 +522,30 @@ Build the pangenome graph for chromosome 20.
     mkdir -p $DIR_BASE/graphs
     cd $DIR_BASE/graphs
 
-    pggb -i $DIR_BASE/assemblies/partitioning/chr20.fa.gz -o $DIR_BASE/graphs/pggb.chr20 -p 98 -k 79 -D /scratch -t 32
+    pggb -i $DIR_BASE/assemblies/partitioning/chr20.fa.gz -o $DIR_BASE/graphs/pggb.chr20 -p 98 -s 10k -k 79 -V 'chm13:1000,grch38:1000' -D /scratch -t 32
 
-This should take less than 1 hour.
+This should take approximately 1 hour and will generate a pangenome graph, several graph visualizations, and 2 variant sets called from the assemblies.
 
 **IMPORTANT**: The `-D` parameter in `pggb` is used to specify the directory used for temporary files.
-This directory should be on a high-speed disk (like an SSD) to avoid severe slowdowns during graph construction.
+This directory should be on a high-speed disk (like an SSD) to avoid severe slowdowns during graph construction, sorting and graph layout generation.
+
+<details>
+  <summary>Click me for considerations about the `-n` parameter</summary>
 
 Note that we are not specifying the number of haplotypes (`-n` parameter).
 Indeed, `pggb` can automatically obtain this information thanks to the fact that the input sequences respect the PanSN naming.
+</details>
+
+<details>
+  <summary>Click me for considerations about the `-p` and `-s` parameters</summary>
 
 Since human presents a low sequence divergence, we set the mapping identity (`-p` parameter) in `pggb` to `98`.
-Additionally, we specify `-s 10k` to get a simpler and more linear graph structure, which is easier to work with.
-Lower values lead to more sensitive mappings but to the possibility of having circular graphs due to the similarity of the telomeres.
+Additionally, we specify `-s 10k` (equivalent to specifying `-s 10000`) to get a simpler and more linear graph structure, which is easier to work with.
+Lower values of `-s` and `-p` lead to more sensitive mappings but to the possibility of having circular graphs due to the sequence similarity of the telomeres.
+</details>
+
+<details>
+  <summary>Click me for considerations about the `-k` parameter</summary>
 
 The `-k` parameter is used to filter exact matches in the sequence alignments shorter than 79 bps.
 Indeed, graph induction with `seqwish` often works better when we filter short matches out of the input alignments.
@@ -522,6 +554,16 @@ Removing short matches can simplify the graph and remove spurious relationships 
 However, this filter might lead to under-alignment, that is resolved in the graph normalization step with `smoothxg`.
 By default, `pggb` uses `-k 23`.
 With human data, higher values work well.
+</details>
+
+<details>
+  <summary>Click me for considerations about the `-V` parameter</summary>
+
+The `-V 'chm13:1000,grch38:1000'` parameter specifies to call variants from the assemblies using two different genomes as reference.
+This will generate two VCF files: in one the variants will be expressed relative to CHM13, in the other the variants will be expressed relative to GRCh38.
+The `1000` valye specifies to decompose the variants, filtering sites whose max allele length is greater than 1000 bps.
+We keep this value low here to save time, but you can consider specifying higher values such as 10000 or 100000, but this will significantly increase the VCF normalization time.
+</details>
 
 Use `odgi stats` to obtain the graph length, and the number of nodes, edges, and paths.
 Do you think the resulting pangenome graph represents the input sequences well?
@@ -529,12 +571,16 @@ Check the length and the number of the input sequences to answer this question.
 
 <details>
   <summary>Click me for the answer</summary>
+
 chr20 is approximately 64-66 Mbp long in reference genomes.
-There is no right value because it always depends on how much genetic variability we want to represent in the graph.
-Lower `-s` and `-p` values will tend to represent more homologies, getting shorter, but more complex, graphs.
+There is no right graph length because it always depends on how much genetic variability we want to represent in the graph.
+Lower `-s` and `-p` values will tend to represent more homologies, leading to shorter, but more complex, graphs.
 </details>
 
-Take a look at the PNG files in the `pggb.chr20` folder. Is the layout of the graph roughly linear?
+Take a look at the PNG files in the `pggb.chr20` folder.
+Is the layout of the graph roughly linear?
+Please note that when pangenome graphs are linear, the `*.draw multiqc.png` files may be difficult to view with the default image viewer.
+In these cases, you can view them with alternative software such as [GIMP](https://www.gimp.org/).
 
 Generate another `odgi viz` visualization with
 
@@ -548,7 +594,7 @@ and the newly generated image (`chr20.fa.gz.a8a102b.c2fac19.afc7f52.smooth.final
 <details>
   <summary>Click me for the answer</summary>
 
-The contigs of the two additional haplotypes are visually collapsed into one path each.
+Contigs belonging to the same haplotype are visually collapsed into one colored bar each.
 </details>
 
 
@@ -612,6 +658,7 @@ With 90 haplotypes (44 diploid samples plus 2 haploid reference genomes), how ma
 
 <details>
   <summary>Click me for the answer</summary>
+
 We expect 90 paths in the extracted graph, one for each haplotype.
 </details>
 
@@ -677,6 +724,7 @@ What information does this image provide us about the state of the C4 region in 
 
 <details>
   <summary>Click me for the answer</summary>
+
 The two reference genomes have 2 copies of the C4 genes and both of them present the HERV sequence.
 HG00348 has 1 copy (HERV sequence included) in both its haplotypes.
 HG01071 has the MATERNAL haplotype with 3 copies, with 2 of them without the HERV sequence, and the PATERNAL haplotype with 2 copies of which 1 without the HERV sequence.
