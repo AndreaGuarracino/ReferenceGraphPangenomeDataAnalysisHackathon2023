@@ -92,7 +92,7 @@ In a GFA file there are these following line types:
 Of note, the format does not specify that these lines come in a particular order.
 </details>
 
-Try to run `vf construct` with different values of `-m` and observe the different results.
+Try to run `vg construct` with different values of `-m` and observe the different results.
 
 Now let's build a new graph that has some variants built into it.
 First, take a look at `tiny/tiny.vcf.gz`, which contains variants in (gzipped) [VCF](https://samtools.github.io/hts-specs/VCFv4.2.pdf) format.
@@ -145,7 +145,6 @@ This can be helpful to take at graphs that are too big to be directly loaded wit
 Now, let's build a new complex graph.
 First, take a look at `tiny/multi.vcf.gz`, which contains multiallelic variants. 
 Try to generate with that input a graph in GFA format and visualize the output with `Bandage`. What are you able to see?
-
 
 ## Small pangenome graph building from sequence alignments
 
@@ -220,18 +219,33 @@ Take a look at the files in the `out_DRB1_3123.1` folder.
 - `*.og`: final pangenome graph in ODGI format (used in `odgi`);
 - `*.lay`: graph layout in `LAY` format (used in `odgi`);
 - `*.lay.tsv`: graph layout in `TSV` format;
+
+Take a look at the images in the same folder:
 - `*.draw.png`: static graph layout representation;
+  ![DRB1-3123 fa gz bf3285f eb0f3d3 9c6ea4f smooth final og lay draw](https://github.com/AndreaGuarracino/ReferenceGraphPangenomeDataAnalysisHackathon2023/assets/52487106/9128bfe7-e930-4b3b-8297-07618f0ee762)
 - `*.draw_multiqc.png`: static graph layout representation with sequences as colored lines;
+![DRB1-3123 fa gz bf3285f eb0f3d3 9c6ea4f smooth final og lay draw_multiqc](https://github.com/AndreaGuarracino/ReferenceGraphPangenomeDataAnalysisHackathon2023/assets/52487106/db31ad60-68b6-4820-a925-2ecf9590b439)
 
 The `*.viz_*.png` images represent the graph in 1 dimension: all nodes are on the horizontal axis, from left to right, 
 the sequences are represented as colored bars and the graph links are represented as black lines at the bottom of the paths.
 Each image follow a different color scheme:
 - `*.viz_multiqc.png`: each path has a different color, without any meaning;
-- `*.viz_depth_multiqc.png`: paths are colored by depth. We define **node depth in a path** as the number of times the node is crossed by a path; 
+  ![DRB1-3123 fa gz bf3285f eb0f3d3 9c6ea4f smooth final og viz_multiqc](https://github.com/AndreaGuarracino/ReferenceGraphPangenomeDataAnalysisHackathon2023/assets/52487106/ac74e9eb-3ae7-40cf-9f57-f3f815e9e71e)
+
+- `*.viz_depth_multiqc.png`: paths are colored by depth. We define **node depth in a path** as the number of times the node is crossed by a path;
+  ![DRB1-3123 fa gz bf3285f eb0f3d3 9c6ea4f smooth final og viz_depth_multiqc](https://github.com/AndreaGuarracino/ReferenceGraphPangenomeDataAnalysisHackathon2023/assets/52487106/fbbd355d-36db-4e0a-9dbe-43b44af67d4c)
+
 - `*.viz_inv_multiqc.png`: paths are colored with respect to the strandness (black for forward, red for reverse);
+  ![DRB1-3123 fa gz bf3285f eb0f3d3 9c6ea4f smooth final og viz_inv_multiqc](https://github.com/AndreaGuarracino/ReferenceGraphPangenomeDataAnalysisHackathon2023/assets/52487106/e95bb038-56a6-4b5d-94fe-98a2a0cf854e)
+
 - `.viz_pos_multiqc.png`: paths are colored with respect to the node position in each path. Smooth color gradients highlight well-sorted graphs;
+  ![DRB1-3123 fa gz bf3285f eb0f3d3 9c6ea4f smooth final og viz_pos_multiqc](https://github.com/AndreaGuarracino/ReferenceGraphPangenomeDataAnalysisHackathon2023/assets/52487106/0beda634-cb2e-4c13-acdb-0871005f3c5a)
+
 - `*.viz_uncalled_multiqc.png`: uncalled bases (`Ns`) are colored in green;
+![DRB1-3123 fa gz bf3285f eb0f3d3 9c6ea4f smooth final og viz_uncalled_multiqc](https://github.com/AndreaGuarracino/ReferenceGraphPangenomeDataAnalysisHackathon2023/assets/52487106/53fc0155-d473-4ec9-891e-d1859d1caf3a)
+  
 - `*.viz_O_multiqc.png`: all paths are compressed into a single line, where we color by path coverage.
+  ![DRB1-3123 fa gz bf3285f eb0f3d3 9c6ea4f smooth final og viz_O_multiqc](https://github.com/AndreaGuarracino/ReferenceGraphPangenomeDataAnalysisHackathon2023/assets/52487106/bb5331c1-8321-49de-86a2-7c8cbf6328aa)
 
 Try to visualize the graph also with `Bandage`.
 
