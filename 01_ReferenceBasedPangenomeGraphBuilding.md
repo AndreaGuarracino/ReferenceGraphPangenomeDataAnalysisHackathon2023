@@ -15,23 +15,19 @@ It is already available on the course workstations.
 In this exercise, you will use small toy examples from the `test` directory of `vg`.
 So make sure you have checked out `vg` repository:
 
-    cd ~
+    cd /cbio/users/$USER
 	git clone https://github.com/vgteam/vg.git
 
 Now create a directory to work on for this tutorial:
 
-    cd ~
+    cd /cbio/users/$USER
 	mkdir ref_based_pangenome_graph_building
 	cd ref_based_pangenome_graph_building
-	ln -s ~/vg/test/tiny
+	ln -s /cbio/users/$USER/vg/test/tiny
 
 ### Constructing and viewing your first graphs
 
 First we will use `vg construct` to build our first graph.
-Run it without parameters to get information on its usage:
-
-	vg construct
-
 We will construct a reference-based graph from the sequence in file `tiny/tiny.fa`, which looks like this:
 
 	>x
@@ -94,7 +90,7 @@ We can write the graph in [GFA](https://github.com/GFA-spec/GFA-spec/blob/master
 
 A tool for visualizing (not too big) pangenome graphs is [BandageNG](https://github.com/asl/BandageNG).
 It supports graphs in GFA format.
-To use Bandage, just download it locally on your computer:
+To use Bandage, just download it **locally on your computer**:
 
     wget -c https://github.com/asl/BandageNG/releases/download/v2022.09/BandageNG-9eb84c2-x86_64.AppImage
     chmod +x BandageNG-9eb84c2-x86_64.AppImage

@@ -12,24 +12,26 @@
 
 Check out `odgi` repository (we need one of its example):
 
-    cd ~
+    cd /cbio/users/$USER
     git clone https://github.com/pangenome/odgi.git
 
 Now create a directory to work on for this tutorial:
 
-    cd ~
-	mkdir understanding_pangenome_graphs
-	cd understanding_pangenome_graphs
-    ln -s ~/odgi/test
+    cd /cbio/users/$USER
+	mkdir understanding_pan_graphs
+	cd understanding_pan_graphs
+    ln -s /cbio/users/$USER/odgi/test
 
 ### MHC locus
 
 Download the HPRC pangenome graph of the human chromosome 6 in GFA format, decompress it, and convert it to a graph in `odgi` format.
 
+    DIR_BASE=/cbio/users/$USER
+    cd $DIR_BASE/understanding_pan_graphs
     wget https://s3-us-west-2.amazonaws.com/human-pangenomics/pangenomes/scratch/2021_11_16_pggb_wgg.88/chroms/chr6.pan.fa.a2fb268.4030258.6a1ecc2.smooth.gfa.gz
     gunzip chr6.pan.fa.a2fb268.4030258.6a1ecc2.smooth.gfa.gz
 
-    odgi build -g chr6.pan.fa.a2fb268.4030258.6a1ecc2.smooth.gfa -o chr6.pan.og -t 16 -P
+    odgi build -g $DIR_BASE/understanding_pan_graphs/chr6.pan.fa.a2fb268.4030258.6a1ecc2.smooth.gfa -o $DIR_BASE/understanding_pan_graphs/chr6.pan.og -t 16 -P
 
 This graph contains contigs of 88 haploid, phased human genome assemblies from 44 individuals, plus the `chm13` and `grch38` reference genomes.
 
@@ -41,17 +43,23 @@ The human MHC is also called the HLA (human leukocyte antigen) complex (often ju
 
 To see the coordinates of some HLA genes, execute:
 
+    DIR_BASE=/cbio/users/$USER
+    cd $DIR_BASE/understanding_pan_graphs
     head test/chr6.HLA_genes.bed -n 5
 
 The coordinates are expressed with respect to the `grch38` reference genome.
 
 To extract the subgraph containing all the HLA genes annotated in the `chr6.HLA_genes.bed` file, let's prepare a BED with a single interval containing all those genes:
 
+    DIR_BASE=/cbio/users/$USER
+    cd $DIR_BASE/understanding_pan_graphs
     bedtools merge -i test/chr6.HLA_genes.bed -d 10000000 > chr6.interval_to_extract.bed
 
 and then we execute:
 
-    odgi extract -i chr6.pan.og -o chr6.pan.MHC.og -b chr6.interval_to_extract.bed -O -t 16 -P
+    DIR_BASE=/cbio/users/$USER
+    cd $DIR_BASE/understanding_pan_graphs
+    odgi extract -i $DIR_BASE/understanding_pan_graphs/chr6.pan.og -o $DIR_BASE/understanding_pan_graphs/chr6.pan.MHC.og -b $DIR_BASE/understanding_pan_graphs/chr6.interval_to_extract.bed -O -t 16 -P
 
 The instruction extracts:
 
@@ -70,7 +78,9 @@ We expect 90 paths in the extracted graph, one for each haplotype.
 
 To visualize the graph, execute:
 
-    odgi viz -i chr6.pan.MHC.og -o chr6.pan.MHC.png -s '#'
+    DIR_BASE=/cbio/users/$USER
+    cd $DIR_BASE/understanding_pan_graphs
+    odgi viz -i $DIR_BASE/understanding_pan_graphs/chr6.pan.MHC.og -o $DIR_BASE/understanding_pan_graphs/chr6.pan.MHC.png -s '#'
 
 The `-s '#'` parameter is to color each haplotype (not each contig) with a different color .
 
@@ -79,20 +89,27 @@ If so, which ones? Counts the number of contigs for each haplotype.
 
 Generate the graph layout with `odgi layout`:
 
-    odgi layout -i chr6.pan.MHC.og -o chr6.pan.MHC.lay -t 32 --temp-dir /scratch3/users/$USER -P
+    DIR_BASE=/cbio/users/$USER
+    cd $DIR_BASE/understanding_pan_graphs
+    odgi layout -i $DIR_BASE/understanding_pan_graphs/chr6.pan.MHC.og -o $DIR_BASE/understanding_pan_graphs/chr6.pan.MHC.lay -t 32 --temp-dir /scratch3/users/$USER -P
 
 **IMPORTANT**: The `--temp-dir` parameter is used to specify the directory used for temporary files.
 This directory should be on a high-speed disk (like an SSD) to avoid severe slowdowns during the graph layout computation.
 
 Visualize the layout with `odgi draw`:
 
-    odgi draw -i chr6.pan.MHC.og -c chr6.pan.MHC.lay -p chr6.pan.MHC.layout.png
+    DIR_BASE=/cbio/users/$USER
+    cd $DIR_BASE/understanding_pan_graphs
+    odgi draw -i $DIR_BASE/understanding_pan_graphs/chr6.pan.MHC.og -c $DIR_BASE/understanding_pan_graphs/chr6.pan.MHC.lay -p $DIR_BASE/understanding_pan_graphs/chr6.pan.MHC.layout.png
 
 The MHC locus includes the complement component 4 (C4) region, which encodes proteins involved in the complement system.
 In humans, the C4 gene exists as 2 functionally distinct genes, C4A and C4B, which both vary in structure and **copy number** ([Sekar et al., 2016](https://doi.org/10.1038/nature16549)).
 Moreover, C4A and C4B genes segregate in both long and short genomic forms, distinguished by the **presence or absence** of a human endogenous retroviral (HERV) sequence.
 
 Find C4 coordinates:
+
+    DIR_BASE=/cbio/users/$USER
+    cd $DIR_BASE/understanding_pan_graphs
 
     wget http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.chrom.sizes
     wget https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/genes/hg38.ncbiRefSeq.gtf.gz
@@ -103,27 +120,34 @@ Find C4 coordinates:
 
 Extract the C4 locus:
 
-    odgi extract -i chr6.pan.og -b hg38.ncbiRefSeq.C4.coordinates.bed -o - -O -t 16 -P | odgi sort -i - -o chr6.pan.C4.sorted.og -p Ygs -x 100 -t 16 --temp-dir /scratch3/users/$USER -P
+    DIR_BASE=/cbio/users/$USER
+    cd $DIR_BASE/understanding_pan_graphs
+    odgi extract -i $DIR_BASE/understanding_pan_graphs/chr6.pan.og -b $DIR_BASE/understanding_pan_graphs/hg38.ncbiRefSeq.C4.coordinates.bed -o - -O -t 16 -P | odgi sort -i - -o $DIR_BASE/understanding_pan_graphs/chr6.pan.C4.sorted.og -p Ygs -x 100 -t 16 --temp-dir /scratch3/users/$USER -P
 
 `odgi sort -p Ygs` will apply three different graph sorting algorithms, the same that are used in `pggb`.
 
 Regarding the `odgi viz` visualization, select the haplotypes to visualize
 
-    odgi paths -i chr6.pan.C4.sorted.og  -L | grep 'chr6\|HG00438\|HG0107\|HG01952' > chr6.selected_paths.txt
+    DIR_BASE=/cbio/users/$USER
+    cd $DIR_BASE/understanding_pan_graphs
+    odgi paths -i $DIR_BASE/understanding_pan_graphs/chr6.pan.C4.sorted.og  -L | grep 'chr6\|HG00438\|HG0107\|HG01952' > $DIR_BASE/understanding_pan_graphs/chr6.selected_paths.txt
 
 and visualize them
 
+    DIR_BASE=/cbio/users/$USER
+    cd $DIR_BASE/understanding_pan_graphs
+
     # odgi viz: default mode
-    odgi viz -i chr6.pan.C4.sorted.og -o chr6.pan.C4.sorted.png -p chr6.selected_paths.txt
+    odgi viz -i $DIR_BASE/understanding_pan_graphs/chr6.pan.C4.sorted.og -o $DIR_BASE/understanding_pan_graphs/chr6.pan.C4.sorted.png -p $DIR_BASE/understanding_pan_graphs/chr6.selected_paths.txt
 
     # odgi viz: color by strand
-    odgi viz -i chr6.pan.C4.sorted.og -o chr6.pan.C4.sorted.z.png -p chr6.selected_paths.txt -z
+    odgi viz -i $DIR_BASE/understanding_pan_graphs/chr6.pan.C4.sorted.og -o $DIR_BASE/understanding_pan_graphs/chr6.pan.C4.sorted.z.png -p $DIR_BASE/understanding_pan_graphs/chr6.selected_paths.txt -z
 
     # odgi viz: color by position
-    odgi viz -i chr6.pan.C4.sorted.og -o chr6.pan.C4.sorted.du.png -p chr6.selected_paths.txt -du
+    odgi viz -i $DIR_BASE/understanding_pan_graphs/chr6.pan.C4.sorted.og -o $DIR_BASE/understanding_pan_graphs/chr6.pan.C4.sorted.du.png -p $DIR_BASE/understanding_pan_graphs/chr6.selected_paths.txt -du
 
     # odgi viz: color by depth
-    odgi viz -i chr6.pan.C4.sorted.og -o chr6.pan.C4.sorted.m.png -p chr6.selected_paths.txt -m -B Spectral:4
+    odgi viz -i $DIR_BASE/understanding_pan_graphs/chr6.pan.C4.sorted.og -o $DIR_BASE/understanding_pan_graphs/chr6.pan.C4.sorted.m.png -p $DIR_BASE/understanding_pan_graphs/chr6.selected_paths.txt -m -B Spectral:4
 
 For the `chr6.pan.C4.sorted.m.png` image we used the Spectra color palette with 4 levels of node depths, so  white indicates no depth, while grey, red, and yellow indicate depth 1, 2, and greater than or equal to 3, respectively.
 What information does this image provide us about the state of the C4 region in the selected haplotypes?
@@ -150,6 +174,9 @@ To obtain another view of a collapsed locus, we can apply `odgi untangle` to lin
 
 To untangle the C4 graph, execute:
 
+    DIR_BASE=/cbio/users/$USER
+    cd $DIR_BASE/understanding_pan_graphs
+
     (echo query.name query.start query.end ref.name ref.start ref.end score inv self.cov n.th |
       tr ' ' '\t'; odgi untangle -i chr6.pan.C4.sorted.og -r $(odgi paths -i chr6.pan.C4.sorted.og -L | grep grch38) -t 16 -m 256 -P |
       bedtools sort -i - ) | awk '$8 == "-" { x=$6; $6=$5; $5=x; } { print }' |
@@ -171,26 +198,37 @@ We start with gene annotations against the GRCh38 reference.
 Our annotations are against the full `grch38#chr6`, in `test/chr6.C4.bed`.
 Take a look at the first column in the annotation file
 
+    DIR_BASE=/cbio/users/$USER
+    cd $DIR_BASE/understanding_pan_graphs
     head test/chr6.C4.bed
 
 However, the C4 locus graph `chr6.c4.gfa` is over the reference range, that is `grch38#chr6:31972046-32055647`.
 With `odgi paths` we can take a look at the names of the paths in the graph:
 
+    DIR_BASE=/cbio/users/$USER
+    cd $DIR_BASE/understanding_pan_graphs
     odgi paths -i chr6.pan.C4.sorted.og -L | grep grc
 
 So, we must adjust the annotations to match the subgraph to ensure that path names and coordinates exactly correspond between the BED and GFA.
 We do so using `odgi procbed`, which cuts BED records to fit within a given subgraph:
 
+    DIR_BASE=/cbio/users/$USER
+    cd $DIR_BASE/understanding_pan_graphs
     odgi procbed -i chr6.pan.C4.sorted.og -b test/chr6.C4.bed > chr6.C4.adj.bed
 
 The coordinate space now matches that of the C4 subgraph.
 Now, we can inject these annotations into the graph:
 
+    DIR_BASE=/cbio/users/$USER
+    cd $DIR_BASE/understanding_pan_graphs
     odgi inject -i chr6.pan.C4.sorted.og -b chr6.C4.adj.bed -o chr6.C4.genes.og -P
 
 Use `odgi viz` to visualize the new subgraph with the injected paths.
 
 We now use the gene names and the `gggenes` output format from `odgi untangle` to obtain a gene arrow map. We specify the injected paths as target paths:
+
+    DIR_BASE=/cbio/users/$USER
+    cd $DIR_BASE/understanding_pan_graphs
 
     odgi paths -i chr6.C4.genes.og -L | tail -4 > chr6.C4.gene.names.txt
 
@@ -210,6 +248,9 @@ If you have `R` installed on your local machine, you can plot `odgi untangle` ou
 
 The plot will look a bit odd because some of the paths are in reverse complement orientation relative to the annotations.
 We can clean this up by using `odgi flip`, which flips paths around if they tend to be in the reverse complement orientation relative to the graph:
+
+    DIR_BASE=/cbio/users/$USER
+    cd $DIR_BASE/understanding_pan_graphs
 
     odgi flip -i chr6.C4.genes.og -o chr6.C4.genes.flip.og -t 16 -P
     

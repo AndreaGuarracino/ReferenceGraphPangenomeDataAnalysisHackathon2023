@@ -12,14 +12,15 @@
 
 Create a directory to work on for this tutorial:
 
-    cd ~
+    cd /cbio/users/$USER
 	mkdir human_pangenome_graphs
 	cd human_pangenome_graphs
 
 Download 2 human references and 4 diploid human *de novo* assemblies from the Human Pangenome Reference Consortium (HPRC) data:
 
-    mkdir -p ~/human_pangenome_graphs/assemblies
-    cd ~/human_pangenome_graphs/assemblies
+    DIR_BASE=/cbio/users/$USER
+    mkdir -p $DIR_BASE/human_pangenome_graphs/assemblies
+    cd $DIR_BASE/human_pangenome_graphs/assemblies
 
     wget -c https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release/references/GRCh38/GCA_000001405.15_GRCh38_no_alt_analysis_set.fasta.gz
     wget -c https://s3-us-west-2.amazonaws.com/human-pangenomics/T2T/CHM13/assemblies/analysis_set/chm13v2.0.fa.gz
@@ -34,6 +35,8 @@ Download 2 human references and 4 diploid human *de novo* assemblies from the Hu
 
 Decompress and index the assemblies:
 
+    DIR_BASE=/cbio/users/$USER
+    cd $DIR_BASE/human_pangenome_graphs/assemblies
     gunzip *genbank.fa.gz
     ls *genbank.fa | while read f; do echo $f; samtools faidx $f; done
 
@@ -47,6 +50,9 @@ The HPRC samples already follow such a convention (`1` is the PATERNAL haplotype
 So, let's add a prefix to their sequence names.
 We can do that by using [fastix](https://github.com/ekg/fastix):
 
+    DIR_BASE=/cbio/users/$USER
+    cd $DIR_BASE/human_pangenome_graphs/assemblies
+
     fastix -p 'grch38#1#' <(zcat GCA_000001405.15_GRCh38_no_alt_analysis_set.fasta.gz) | bgzip -@ 16 > grch38_full.fa.gz
     samtools faidx grch38_full.fa.gz
     
@@ -55,10 +61,14 @@ We can do that by using [fastix](https://github.com/ekg/fastix):
 
 About GRCh38, we remove the unplaced contigs that are (hopefully) properly represented in CHM13:
 
+    DIR_BASE=/cbio/users/$USER
+    cd $DIR_BASE/human_pangenome_graphs/assemblies
     samtools faidx grch38_full.fa.gz $(cut -f 1 grch38_full.fa.gz.fai | grep -v _ ) | bgzip -@ 16 > grch38.fa.gz
 
 Cleaning:
 
+    DIR_BASE=/cbio/users/$USER
+    cd $DIR_BASE/human_pangenome_graphs/assemblies
     rm chm13v2.0.fa.gz GCA_000001405.15_GRCh38_no_alt_analysis_set.fasta.gz grch38_full.fa.gz.*
 
 Take a look at how sequence names are changed in the FASTA files.
@@ -68,20 +78,24 @@ Take a look at how sequence names are changed in the FASTA files.
 To reduce analysis complexity, we partition assembly contigs by chromosome and generate chromosome-specific pangenome graphs.
 For doing that, we first need to put the two reference genomes together
 
+    DIR_BASE=/cbio/users/$USER
+    cd $DIR_BASE/human_pangenome_graphs/assemblies
     zcat chm13.fa.gz grch38.fa.gz | bgzip -@ 16 > chm13+grch38.fa.gz && samtools faidx chm13+grch38.fa.gz
 
 and then map each assembly against the two reference genomes:
 
-    DIR_BASE=~/human_pangenome_graphs
-    PATH_REFERENCES_FASTA=$DIR_BASE/assemblies/chm13+grch38.fa.gz
+    DIR_BASE=/cbio/users/$USER
+    cd $DIR_BASE/human_pangenome_graphs
 
-    mkdir -p $DIR_BASE/assemblies/partitioning
+    PATH_REFERENCES_FASTA=$DIR_BASE/human_pangenome_graphs/assemblies/chm13+grch38.fa.gz
 
-    ls $DIR_BASE/assemblies/*.f1_assembly_v2_genbank.fa | while read FASTA; do
+    mkdir -p $DIR_BASE/human_pangenome_graphs/assemblies/partitioning
+
+    ls $DIR_BASE/human_pangenome_graphs/assemblies/*.f1_assembly_v2_genbank.fa | while read FASTA; do
       NAME=$(basename $FASTA .fa);
       echo $NAME
 
-      PATH_PAF=$DIR_BASE/assemblies/partitioning/$NAME.vs.ref.paf
+      PATH_PAF=$DIR_BASE/human_pangenome_graphs/assemblies/partitioning/$NAME.vs.ref.paf
       wfmash $PATH_REFERENCES_FASTA $FASTA -m -N -t 32 > $PATH_PAF
     done
 
@@ -141,6 +155,8 @@ These short arms are available in CHM13 and indeed we are able to map lots of co
 
 It should be noted that also with `wfmash -N`, there can be cases with contigs fully mapping to different cromosomes. For example:
 
+    DIR_BASE=/cbio/users/$USER
+    cd $DIR_BASE/human_pangenome_graphs
     grep 'HG00438#2#JAHBCA010000147.1' *paf
       HG00438.maternal.f1_assembly_v2_genbank.vs.ref.paf:HG00438#2#JAHBCA010000147.1  738336  0       738336  +       chm13#1#chr13 113566686       8582789 9321125 245     738336  23      id:f:99.4899    kc:f:0.057824
       HG00438.maternal.f1_assembly_v2_genbank.vs.ref.paf:HG00438#2#JAHBCA010000147.1  738336  0       738336  +       chm13#1#chr22 51324926        5299094 6037430 245     738336  23      id:f:99.4899    kc:f:0.057824
@@ -148,12 +164,12 @@ It should be noted that also with `wfmash -N`, there can be cases with contigs f
 For which there is not enough information to determine which is the best chromosome to map against (_acrocentric chromosomes are hard!_).
 For these case, we just randomly take one result (_we are working on implementing the random sampling directly in `wfmash`_, to make user life easier).
 
-    DIR_BASE=~/human_pangenome_graphs
-    ls $DIR_BASE/assemblies/*.f1_assembly_v2_genbank.fa | while read FASTA; do
+    DIR_BASE=/cbio/users/$USER
+    ls $DIR_BASE/human_pangenome_graphs/assemblies/*.f1_assembly_v2_genbank.fa | while read FASTA; do
       NAME=$(basename $FASTA .fa);
       echo $NAME
 
-      PATH_PAF=$DIR_BASE/assemblies/partitioning/$NAME.vs.ref.paf
+      PATH_PAF=$DIR_BASE/human_pangenome_graphs/assemblies/partitioning/$NAME.vs.ref.paf
       cut -f 1,6 $PATH_PAF | sed -e 's/chm13#1#//g' -e 's/grch38#1#//g' | awk '{
           contig = $1;
       
@@ -167,40 +183,41 @@ For these case, we just randomly take one result (_we are working on implementin
         for (contig in data) {
           print contig "\t" data[contig];
         }
-      }' > $DIR_BASE/assemblies/partitioning/$NAME.vs.ref.assignments.tsv
+      }' > $DIR_BASE/human_pangenome_graphs/assemblies/partitioning/$NAME.vs.ref.assignments.tsv
     done
 
 Now we can subset assembly contigs by chromosome:
 
-    DIR_BASE=~/human_pangenome_graphs
+    DIR_BASE=/cbio/users/$USER
     ( seq 1 22; echo X; echo Y ) | while read i; do
       echo chr$i
       
-      grep chr$i --no-filename -w $DIR_BASE/assemblies/partitioning/*.assignments.tsv | cut -f 1 > $DIR_BASE/assemblies/partitioning/chr$i.contigs.txt
+      grep chr$i --no-filename -w $DIR_BASE/human_pangenome_graphs/assemblies/partitioning/*.assignments.tsv | cut -f 1 > $DIR_BASE/human_pangenome_graphs/assemblies/partitioning/chr$i.contigs.txt
     done
 
 Then, we create a FASTA file for each chromosome, reference chromosomes included.
 To save time and space, let's take only sequences from chromosome 20:
 
-    DIR_BASE=~/human_pangenome_graphs
+    DIR_BASE=/cbio/users/$USER
     ( echo 20 ) | while read i; do
       echo chr$i
-      samtools faidx $DIR_BASE/assemblies/chm13+grch38.fa.gz chm13#1#chr$i grch38#1#chr$i > $DIR_BASE/assemblies/partitioning/chr$i.fa
+      samtools faidx $DIR_BASE/human_pangenome_graphs/assemblies/chm13+grch38.fa.gz chm13#1#chr$i grch38#1#chr$i > $DIR_BASE/human_pangenome_graphs/assemblies/partitioning/chr$i.fa
       
-      ls $DIR_BASE/assemblies/*.f1_assembly_v2_genbank.fa | while read FASTA; do
+      ls $DIR_BASE/human_pangenome_graphs/assemblies/*.f1_assembly_v2_genbank.fa | while read FASTA; do
         NAME=$(basename $FASTA .fa);
         echo $NAME
 
-        samtools faidx $FASTA $( comm -12 <(cut -f 1 $FASTA.fai | sort) <(sort $DIR_BASE/assemblies/partitioning/chr$i.contigs.txt) ) >> $DIR_BASE/assemblies/partitioning/chr$i.fa
+        samtools faidx $FASTA $( comm -12 <(cut -f 1 $FASTA.fai | sort) <(sort $DIR_BASE/human_pangenome_graphs/assemblies/partitioning/chr$i.contigs.txt) ) >> $DIR_BASE/human_pangenome_graphs/assemblies/partitioning/chr$i.fa
       done
 
-      bgzip -@ 16 $DIR_BASE/assemblies/partitioning/chr$i.fa
-      samtools faidx $DIR_BASE/assemblies/partitioning/chr$i.fa.gz
+      bgzip -@ 16 $DIR_BASE/human_pangenome_graphs/assemblies/partitioning/chr$i.fa
+      samtools faidx $DIR_BASE/human_pangenome_graphs/assemblies/partitioning/chr$i.fa.gz
     done
 
 Check that everything went fine:
 
-    head $DIR_BASE/assemblies/partitioning/chr20.fa.gz.fai | column -t
+    DIR_BASE=/cbio/users/$USER
+    head $DIR_BASE/human_pangenome_graphs/assemblies/partitioning/chr20.fa.gz.fai | column -t
       chm13#1#chr20                66210255  15         60  61
       grch38#1#chr20               64444167  67313791   60  61
       HG00438#2#JAHBCA010000018.1  36199104  132832057  60  61
@@ -216,11 +233,11 @@ Check that everything went fine:
 
 Build the pangenome graph for chromosome 20.
 
-    DIR_BASE=~/human_pangenome_graphs
-    mkdir -p $DIR_BASE/graphs
-    cd $DIR_BASE/graphs
+    DIR_BASE=/cbio/users/$USER
+    mkdir -p $DIR_BASE/human_pangenome_graphs/graphs
+    cd $DIR_BASE/human_pangenome_graphs/graphs
 
-    pggb -i $DIR_BASE/assemblies/partitioning/chr20.fa.gz -o $DIR_BASE/graphs/pggb.chr20 -p 98 -s 10k -k 79 -V 'chm13:1000,grch38:1000' -D /scratch3/users/$USER -t 32
+    pggb -i $DIR_BASE/human_pangenome_graphs/assemblies/partitioning/chr20.fa.gz -o $DIR_BASE/human_pangenome_graphs/graphs/pggb.chr20 -p 98 -s 10k -k 79 -V 'chm13:1000,grch38:1000' -D /scratch3/users/$USER -t 32
 
 This should take approximately 1 hour and will generate a pangenome graph, several graph visualizations, and 2 variant sets called from the assemblies.
 
