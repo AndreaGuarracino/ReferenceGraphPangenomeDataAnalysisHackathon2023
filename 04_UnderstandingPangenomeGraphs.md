@@ -79,7 +79,7 @@ If so, which ones? Counts the number of contigs for each haplotype.
 
 Generate the graph layout with `odgi layout`:
 
-    odgi layout -i chr6.pan.MHC.og -o chr6.pan.MHC.lay -t 32 --temp-dir /scratch -P
+    odgi layout -i chr6.pan.MHC.og -o chr6.pan.MHC.lay -t 32 --temp-dir /scratch3/users/$USER -P
 
 **IMPORTANT**: The `--temp-dir` parameter is used to specify the directory used for temporary files.
 This directory should be on a high-speed disk (like an SSD) to avoid severe slowdowns during the graph layout computation.
@@ -103,7 +103,7 @@ Find C4 coordinates:
 
 Extract the C4 locus:
 
-    odgi extract -i chr6.pan.og -b hg38.ncbiRefSeq.C4.coordinates.bed -o - -O -t 16 -P | odgi sort -i - -o chr6.pan.C4.sorted.og -p Ygs -x 100 -t 16 --temp-dir /scratch -P
+    odgi extract -i chr6.pan.og -b hg38.ncbiRefSeq.C4.coordinates.bed -o - -O -t 16 -P | odgi sort -i - -o chr6.pan.C4.sorted.og -p Ygs -x 100 -t 16 --temp-dir /scratch3/users/$USER -P
 
 `odgi sort -p Ygs` will apply three different graph sorting algorithms, the same that are used in `pggb`.
 
