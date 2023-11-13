@@ -15,20 +15,20 @@ It is already available on the course workstations.
 If you want to build everything on your laptop, follow the instructions at the [pggb homepage](https://github.com/pangenome/pggb#installation).
 So make sure you have checked out `pggb` repository:
 
-    cd /cbio/users/$USER
+    cd /cbio/projects/031/$USER
 	git clone https://github.com/pangenome/pggb.git
 
 Check out also `wfmash` repository (we need one of its scrips):
 
-    cd /cbio/users/$USER
+    cd /cbio/projects/031/$USER
     git clone https://github.com/waveygang/wfmash.git
 
 Now create a directory to work on for this tutorial:
 
-    cd /cbio/users/$USER
+    cd /cbio/projects/031/$USER
 	mkdir align_based_pan_graph_building_small
 	cd align_based_pan_graph_building_small
-	ln -s /cbio/users/$USER/pggb/data
+	ln -s /cbio/projects/031/$USER/pggb/data
 
 ### Building HLA pangenome graphs
 
@@ -36,7 +36,7 @@ The [human leukocyte antigen (HLA)](https://en.wikipedia.org/wiki/Human_leukocyt
 
 Let's build a pangenome graph from a collection of sequences of the DRB1-3123 gene:
 
-    DIR_BASE=/cbio/users/$USER
+    DIR_BASE=/cbio/projects/031/$USER
     cd $DIR_BASE/align_based_pan_graph_building_small
     pggb -i $DIR_BASE/pggb/data/HLA/DRB1-3123.fa.gz -o $DIR_BASE/align_based_pan_graph_building_small/out_DRB1_3123.1 -n 12
 
@@ -51,7 +51,7 @@ It is used to determine the right partial order alignment (POA) problem size for
 
 How many pairwise alignments were used to build the graph (take a look at the `PAF` output)? Visualize the alignments:
 
-    DIR_BASE=/cbio/users/$USER/align_based_pan_graph_building_small
+    DIR_BASE=/cbio/projects/031/$USER/align_based_pan_graph_building_small
     cd $DIR_BASE/out_DRB1_3123.1
     $DIR_BASE/wfmash/scripts/paf2dotplot png large *paf
 
@@ -108,7 +108,7 @@ Try to visualize the graph also with `Bandage`.
 
 Use `odgi stats` to obtain the graph length, and the number of nodes, edges, and paths:
 
-    DIR_BASE=/cbio/users/$USER
+    DIR_BASE=/cbio/projects/031/$USER
     cd $DIR_BASE/align_based_pan_graph_building_small
     odgi stats -i out_DRB1_3123.1/DRB1-3123.fa.gz.bf3285f.eb0f3d3.9c6ea4f.smooth.final.og -S
 
@@ -127,7 +127,7 @@ Pangenome graphs longer than the input sequences are expected because they conta
 `pggb`'s default parameters assume an average divergence of approximately 10% (`-p 90` by default).
 Try building the same pangenome graph by specifying a higher percent identity
 
-    DIR_BASE=/cbio/users/$USER
+    DIR_BASE=/cbio/projects/031/$USER
     cd $DIR_BASE/align_based_pan_graph_building_small
     pggb -i $DIR_BASE/pggb/data/HLA/DRB1-3123.fa.gz -o $DIR_BASE/align_based_pan_graph_building_small/out_DRB1_3123.2 -n 12 -p 95
 
@@ -144,7 +144,7 @@ This happens because the HLA locus is highly polymorphic in the population, with
 
 Try to increase and decrease the segment length (`-s 5000` by default):
 
-    DIR_BASE=/cbio/users/$USER
+    DIR_BASE=/cbio/projects/031/$USER
     cd $DIR_BASE/align_based_pan_graph_building_small
     pggb -i $DIR_BASE/pggb/data/HLA/DRB1-3123.fa.gz -o $DIR_BASE/align_based_pan_graph_building_small/out_DRB1_3123.3 -n 12 -s 15000
     pggb -i $DIR_BASE/pggb/data/HLA/DRB1-3123.fa.gz -o $DIR_BASE/align_based_pan_graph_building_small/out_DRB1_3123.4 -n 12 -s 100

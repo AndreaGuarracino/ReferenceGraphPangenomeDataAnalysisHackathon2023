@@ -15,15 +15,15 @@ It is already available on the course workstations.
 In this exercise, you will use small toy examples from the `test` directory of `vg`.
 So make sure you have checked out `vg` repository:
 
-    cd /cbio/users/$USER
+    cd /cbio/projects/031/$USER
 	git clone https://github.com/vgteam/vg.git
 
 Now create a directory to work on for this tutorial:
 
-    cd /cbio/users/$USER
+    cd /cbio/projects/031/$USER
 	mkdir ref_based_pangenome_graph_building
 	cd ref_based_pangenome_graph_building
-	ln -s /cbio/users/$USER/vg/test/tiny
+	ln -s /cbio/projects/031/$USER/vg/test/tiny
 
 ### Constructing and viewing your first graphs
 
