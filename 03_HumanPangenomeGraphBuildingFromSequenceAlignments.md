@@ -82,7 +82,7 @@ For doing that, we first need to put the two reference genomes together
     cd $DIR_BASE/human_pangenome_graphs/assemblies
     zcat chm13.fa.gz grch38.fa.gz | bgzip -@ 16 > chm13+grch38.fa.gz && samtools faidx chm13+grch38.fa.gz
 
-and then map each assembly against the two reference genomes:
+and then map each assembly against the two reference genomes (use SLURM for these jobs):
 
     DIR_BASE=/cbio/projects/031/$USER
     cd $DIR_BASE/human_pangenome_graphs
@@ -231,7 +231,7 @@ Check that everything went fine:
 
 ### Building chromosome-specific pangenome graphs
 
-Build the pangenome graph for chromosome 20.
+Build the pangenome graph for chromosome 20 (use SLURM for this job).
 
     DIR_BASE=/cbio/projects/031/$USER
     mkdir -p $DIR_BASE/human_pangenome_graphs/graphs
