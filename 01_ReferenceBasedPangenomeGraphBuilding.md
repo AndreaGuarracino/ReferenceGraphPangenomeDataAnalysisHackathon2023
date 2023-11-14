@@ -34,10 +34,7 @@ Now create a directory to work on for this tutorial:
 ### Constructing and viewing your first graphs
 
 First we will use `vg construct` to build our first graph.
-We will construct a reference-based graph from the sequence in file `tiny/tiny.fa`, which looks like this:
-
-	>x
-	CAAATAAGGCTTGGAAATTTTCTGGAGTTCTATTATATTCCAACTCTCTG
+We will construct a reference-based graph from the sequence in file `tiny/tiny.fa`.
 
 To construct a simple graph, run:
 
@@ -51,11 +48,6 @@ To visualize a graph, you can use `vg view`.
 By default, `vg view` will output a graph in [GFA](https://github.com/GFA-spec/GFA-spec/blob/master/GFA1.md) format.
 
 	vg view tiny.ref.vg | column -t
-      H  VN:Z:1.1                                          
-      S  1         CAAATAAGGCTTGGAAATTTTCTGGAGTTCTA        
-      S  2         TTATATTCCAACTCTCTG                      
-      P  x         1+,2+                             *
-      L  1         +                                 2  +  0M
 
 In GFA format, each line is a separate record of some part of the graph.
 The lines come in several types, which are indicated by the first character of the line.
@@ -79,12 +71,6 @@ Now let's build a new graph that has some variants built into it.
 First, take a look at `tiny/tiny.vcf.gz`, which contains variants in (gzipped) [VCF](https://samtools.github.io/hts-specs/VCFv4.2.pdf) format.
 
     zgrep '^##' -v tiny/tiny.vcf.gz | column -t
-      #CHROM  POS  ID  REF  ALT  QUAL  FILTER  INFO                           FORMAT  1
-      x       9    .   G    A    99    .       AC=1;LEN=1;NA=1;NS=1;TYPE=snp  GT      1|0
-      x       10   .   C    T    99    .       AC=2;LEN=1;NA=1;NS=1;TYPE=snp  GT      1|1
-      x       14   .   G    A    99    .       AC=1;LEN=1;NA=1;NS=1;TYPE=snp  GT      1|0
-      x       34   .   T    A    99    .       AC=2;LEN=1;NA=1;NS=1;TYPE=snp  GT      1|1
-      x       39   .   T    A    99    .       AC=1;LEN=1;NA=1;NS=1;TYPE=snp  GT      1|0
 
 then use `vg construct` to build the graph:
 
