@@ -14,9 +14,10 @@ Ask for interactive session (let's ask for a bit more CPUs this round):
 
     srun --nodes=1 -c32 --mem=8g --time 24:00:00 --job-name "interactive_small" --pty /bin/bash
 
-Make sure you have `pggb` and its tools loaded:
+Make sure you have `pggb`, its tools loaded and `bgzip`:
 
     module load pggb
+    module load htslib
 
 Create a directory to work on for this tutorial:
 
