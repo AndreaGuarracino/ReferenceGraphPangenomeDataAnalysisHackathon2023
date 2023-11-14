@@ -29,6 +29,7 @@ Now create a directory to work on for this tutorial:
 ### MHC locus
 
 Download the HPRC pangenome graph of the human chromosome 6 in GFA format, decompress it, and convert it to a graph in `odgi` format.
+Run this job with SLURM.
 
     DIR_BASE=/cbio/projects/031/$USER
     cd $DIR_BASE/understanding_pan_graphs
@@ -59,7 +60,7 @@ To extract the subgraph containing all the HLA genes annotated in the `chr6.HLA_
     cd $DIR_BASE/understanding_pan_graphs
     bedtools merge -i test/chr6.HLA_genes.bed -d 10000000 > chr6.interval_to_extract.bed
 
-and then we execute:
+and then we execute (use SLURM to run this job):
 
     DIR_BASE=/cbio/projects/031/$USER
     cd $DIR_BASE/understanding_pan_graphs
