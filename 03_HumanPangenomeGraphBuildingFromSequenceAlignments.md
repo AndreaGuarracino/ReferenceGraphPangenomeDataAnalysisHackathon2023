@@ -12,7 +12,7 @@
 
 Ask for interactive session (let's ask for a bit more CPUs this round):
 
-    srun --nodes=1 --tasks=16 --mem=8g --time 24:00:00 --job-name "interactive_small" --pty /bin/bash
+    srun --nodes=1 -c32 --mem=8g --time 24:00:00 --job-name "interactive_small" --pty /bin/bash
 
 Make sure you have `pggb` and its tools loaded:
 
@@ -104,7 +104,7 @@ and then map each assembly against the two reference genomes (use SLURM for thes
       echo $NAME
 
       PATH_PAF=$DIR_BASE/human_pangenome_graphs/assemblies/partitioning/$NAME.vs.ref.paf
-      wfmash $PATH_REFERENCES_FASTA $FASTA -m -N -t 32 > $PATH_PAF
+      srun -c32 -p main "wfmash $PATH_REFERENCES_FASTA $FASTA -m -N -t 32 > $PATH_PAF"
     done
 
 `wfmash` should take 4-5 minutes for each haplotype (each FASTA file).
@@ -245,7 +245,7 @@ Build the pangenome graph for chromosome 20 (use SLURM for this job).
     mkdir -p $DIR_BASE/human_pangenome_graphs/graphs
     cd $DIR_BASE/human_pangenome_graphs/graphs
 
-    pggb -i $DIR_BASE/human_pangenome_graphs/assemblies/partitioning/chr20.fa.gz -o $DIR_BASE/human_pangenome_graphs/graphs/pggb.chr20 -p 98 -s 10k -k 79 -V 'chm13:1000,grch38:1000' -D /scratch3/users/$USER -t 32
+    srun -c32 -p main "pggb -i $DIR_BASE/human_pangenome_graphs/assemblies/partitioning/chr20.fa.gz -o $DIR_BASE/human_pangenome_graphs/graphs/pggb.chr20 -p 98 -s 10k -k 79 -V 'chm13:1000,grch38:1000' -D /scratch3/users/$USER -t 32"
 
 This should take approximately 1 hour and will generate a pangenome graph, several graph visualizations, and 2 variant sets called from the assemblies.
 

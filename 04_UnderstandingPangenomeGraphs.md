@@ -12,7 +12,7 @@
 
 Ask for interactive session (let's ask for a bit more CPUs this round):
 
-    srun --nodes=1 --tasks=16 --mem=8g --time 24:00:00 --job-name "interactive_small" --pty /bin/bash
+    srun --nodes=1 -c32 --mem=8g --time 24:00:00 --job-name "interactive_small" --pty /bin/bash
 
 Make sure you have `pggb` and its tools loaded:
 
@@ -40,7 +40,7 @@ Run this job with SLURM.
     wget https://s3-us-west-2.amazonaws.com/human-pangenomics/pangenomes/scratch/2021_11_16_pggb_wgg.88/chroms/chr6.pan.fa.a2fb268.4030258.6a1ecc2.smooth.gfa.gz
     gunzip chr6.pan.fa.a2fb268.4030258.6a1ecc2.smooth.gfa.gz
 
-    odgi build -g $DIR_BASE/understanding_pan_graphs/chr6.pan.fa.a2fb268.4030258.6a1ecc2.smooth.gfa -o $DIR_BASE/understanding_pan_graphs/chr6.pan.og -t 16 -P
+    srun -c16 -p main "odgi build -g $DIR_BASE/understanding_pan_graphs/chr6.pan.fa.a2fb268.4030258.6a1ecc2.smooth.gfa -o $DIR_BASE/understanding_pan_graphs/chr6.pan.og -t 16 -P"
 
 This graph contains contigs of 88 haploid, phased human genome assemblies from 44 individuals, plus the `chm13` and `grch38` reference genomes.
 
@@ -68,7 +68,7 @@ and then we execute (use SLURM to run this job):
 
     DIR_BASE=/cbio/projects/031/$USER
     cd $DIR_BASE/understanding_pan_graphs
-    odgi extract -i $DIR_BASE/understanding_pan_graphs/chr6.pan.og -o $DIR_BASE/understanding_pan_graphs/chr6.pan.MHC.og -b $DIR_BASE/understanding_pan_graphs/chr6.interval_to_extract.bed -O -t 16 -P
+    srun -c16 -p main "odgi extract -i $DIR_BASE/understanding_pan_graphs/chr6.pan.og -o $DIR_BASE/understanding_pan_graphs/chr6.pan.MHC.og -b $DIR_BASE/understanding_pan_graphs/chr6.interval_to_extract.bed -O -t 16 -P"
 
 The instruction extracts:
 
