@@ -14,10 +14,12 @@ Ask for interactive session (let's ask for a bit more CPUs this round):
 
     srun --nodes=1 --tasks=16 --mem=8g --time 24:00:00 --job-name "interactive_small" --pty /bin/bash
 
-Make sure you have `pggb` and its tools installed.
-It is already available on the course workstations.
+Make sure you have `pggb` and its tools loaded:
+
+    module load pggb
+
 If you want to build everything on your laptop, follow the instructions at the [pggb homepage](https://github.com/pangenome/pggb#installation).
-So make sure you have checked out `pggb` repository:
+So make sure you have checked out `pggb` repository (we need data there):
 
     cd /cbio/projects/031/$USER
 	git clone https://github.com/pangenome/pggb.git

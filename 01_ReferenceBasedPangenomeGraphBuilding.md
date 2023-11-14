@@ -14,8 +14,10 @@ Ask for interactive session
 
     srun --nodes=1 --tasks=2 --mem=4g --time 24:00:00 --job-name "interactive_small" --pty /bin/bash
 
-Make sure you have `vg` installed.
-It is already available on the course workstations.
+Make sure you have `vg` loaded (it is inside `pggb` tools)
+
+    module load pggb
+
 In this exercise, you will use small toy examples from the `test` directory of `vg`.
 So make sure you have checked out `vg` repository:
 

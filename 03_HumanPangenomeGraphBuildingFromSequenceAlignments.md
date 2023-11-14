@@ -10,6 +10,14 @@
 
 ### Getting started
 
+Ask for interactive session (let's ask for a bit more CPUs this round):
+
+    srun --nodes=1 --tasks=16 --mem=8g --time 24:00:00 --job-name "interactive_small" --pty /bin/bash
+
+Make sure you have `pggb` and its tools loaded:
+
+    module load pggb
+
 Create a directory to work on for this tutorial:
 
     cd /cbio/projects/031/$USER
@@ -33,7 +41,7 @@ Download 2 human references and 4 diploid human *de novo* assemblies from the Hu
     wget -c https://s3-us-west-2.amazonaws.com/human-pangenomics/working/HPRC_PLUS/HG00733/assemblies/year1_f1_assembly_v2_genbank/HG00733.paternal.f1_assembly_v2_genbank.fa.gz
     wget -c https://s3-us-west-2.amazonaws.com/human-pangenomics/working/HPRC_PLUS/HG00733/assemblies/year1_f1_assembly_v2_genbank/HG00733.maternal.f1_assembly_v2_genbank.fa.gz
 
-Decompress and index the assemblies:
+    Decompress and index the assemblies:
 
     DIR_BASE=/cbio/projects/031/$USER
     cd $DIR_BASE/human_pangenome_graphs/assemblies
