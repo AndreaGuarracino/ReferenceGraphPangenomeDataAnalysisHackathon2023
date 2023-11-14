@@ -87,9 +87,14 @@ To use Bandage, just download it **locally on your computer**:
     wget -c https://github.com/asl/BandageNG/releases/download/v2022.09/BandageNG-9eb84c2-x86_64.AppImage
     chmod +x BandageNG-9eb84c2-x86_64.AppImage
 
-Then download the graph on your computer and try to visualize it locally with:
+Then download the graph on your computer by executing **locally on your computer**:
 
-    ./BandageNG-9eb84c2-x86_64.AppImage load tiny.gfa 
+    USER="PUT HERE YOUR USER NAME ON ILIFU"
+    scp $USER@slurm.ilifu.ac.za:/cbio/projects/031/$USER/ref_based_pangenome_graph_building/tiny.gfa ~/Desktop
+
+and try to visualize it **locally on your computer** with:
+
+    ./BandageNG-9eb84c2-x86_64.AppImage load ~/Desktop/tiny.gfa 
 
 Click the `Drawn graph` button to visualize the graph.
 Click the `Length Node` button under Node labels feature.
