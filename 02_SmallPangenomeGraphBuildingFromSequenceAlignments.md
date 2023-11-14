@@ -51,8 +51,8 @@ It is used to determine the right partial order alignment (POA) problem size for
 
 How many pairwise alignments were used to build the graph (take a look at the `PAF` output)? Visualize the alignments:
 
-    DIR_BASE=/cbio/projects/031/$USER/align_based_pan_graph_building_small
-    cd $DIR_BASE/out_DRB1_3123.1
+    DIR_BASE=/cbio/projects/031/$USER
+    cd $DIR_BASE/align_based_pan_graph_building_small/out_DRB1_3123.1
     $DIR_BASE/wfmash/scripts/paf2dotplot png large *paf
 
 The last command will generate a `out.png` file with a visualization of the alignments.
