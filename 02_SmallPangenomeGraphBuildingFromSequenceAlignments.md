@@ -64,7 +64,7 @@ How many pairwise alignments were used to build the graph (take a look at the `P
     $DIR_BASE/wfmash/scripts/paf2dotplot png large *paf
 
 The last command will generate a `out.png` file with a visualization of the alignments.
-Download it to your computer to visualize it:
+To download the image, run **locally on your computer**:
 
     USER="PUT HERE YOUR USER NAME ON ILIFU"
     scp $USER@slurm.ilifu.ac.za:/cbio/projects/031/$USER/align_based_pan_graph_building_small/out_DRB1_3123.1/out.png ~/Desktop

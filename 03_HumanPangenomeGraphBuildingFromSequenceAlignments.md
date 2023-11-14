@@ -41,7 +41,7 @@ Download 2 human references and 4 diploid human *de novo* assemblies from the Hu
     wget -c https://s3-us-west-2.amazonaws.com/human-pangenomics/working/HPRC_PLUS/HG00733/assemblies/year1_f1_assembly_v2_genbank/HG00733.paternal.f1_assembly_v2_genbank.fa.gz
     wget -c https://s3-us-west-2.amazonaws.com/human-pangenomics/working/HPRC_PLUS/HG00733/assemblies/year1_f1_assembly_v2_genbank/HG00733.maternal.f1_assembly_v2_genbank.fa.gz
 
-    Decompress and index the assemblies:
+Decompress and index the assemblies:
 
     DIR_BASE=/cbio/projects/031/$USER
     cd $DIR_BASE/human_pangenome_graphs/assemblies
@@ -166,8 +166,9 @@ It should be noted that also with `wfmash -N`, there can be cases with contigs f
     DIR_BASE=/cbio/projects/031/$USER
     cd $DIR_BASE/human_pangenome_graphs
     grep 'HG00438#2#JAHBCA010000147.1' *paf
-      HG00438.maternal.f1_assembly_v2_genbank.vs.ref.paf:HG00438#2#JAHBCA010000147.1  738336  0       738336  +       chm13#1#chr13 113566686       8582789 9321125 245     738336  23      id:f:99.4899    kc:f:0.057824
-      HG00438.maternal.f1_assembly_v2_genbank.vs.ref.paf:HG00438#2#JAHBCA010000147.1  738336  0       738336  +       chm13#1#chr22 51324926        5299094 6037430 245     738336  23      id:f:99.4899    kc:f:0.057824
+
+HG00438.maternal.f1_assembly_v2_genbank.vs.ref.paf:HG00438#2#JAHBCA010000147.1  738336  0       738336  +       chm13#1#chr13 113566686       8582789 9321125 245     738336  23      id:f:99.4899    kc:f:0.057824
+HG00438.maternal.f1_assembly_v2_genbank.vs.ref.paf:HG00438#2#JAHBCA010000147.1  738336  0       738336  +       chm13#1#chr22 51324926        5299094 6037430 245     738336  23      id:f:99.4899    kc:f:0.057824
 
 For which there is not enough information to determine which is the best chromosome to map against (_acrocentric chromosomes are hard!_).
 For these case, we just randomly take one result (_we are working on implementing the random sampling directly in `wfmash`_, to make user life easier).
@@ -226,16 +227,6 @@ Check that everything went fine:
 
     DIR_BASE=/cbio/projects/031/$USER
     head $DIR_BASE/human_pangenome_graphs/assemblies/partitioning/chr20.fa.gz.fai | column -t
-      chm13#1#chr20                66210255  15         60  61
-      grch38#1#chr20               64444167  67313791   60  61
-      HG00438#2#JAHBCA010000018.1  36199104  132832057  60  61
-      HG00438#2#JAHBCA010000074.1  688514    169634509  60  61
-      HG00438#2#JAHBCA010000089.1  29856295  170334528  60  61
-      HG00438#2#JAHBCA010000131.1  448468    200688457  60  61
-      HG00438#2#JAHBCA010000161.1  865084    201144429  60  61
-      HG00438#2#JAHBCA010000193.1  130419    202023961  60  61
-      HG00438#2#JAHBCA010000210.1  103918    202156583  60  61
-      HG00438#1#JAHBCB010000023.1  26194192  202262262  60  61
 
 ### Building chromosome-specific pangenome graphs
 
