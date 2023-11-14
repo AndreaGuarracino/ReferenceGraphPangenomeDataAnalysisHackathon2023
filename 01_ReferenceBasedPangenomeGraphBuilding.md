@@ -82,19 +82,32 @@ We can write the graph in [GFA](https://github.com/GFA-spec/GFA-spec/blob/master
 
 A tool for visualizing (not too big) pangenome graphs is [BandageNG](https://github.com/asl/BandageNG).
 It supports graphs in GFA format.
-To use Bandage, just download it **locally on your computer**:
+To use Bandage, just download it **locally on your computer**.
+
+If you have Linux, run:
 
     wget -c https://github.com/asl/BandageNG/releases/download/v2022.09/BandageNG-9eb84c2-x86_64.AppImage
     chmod +x BandageNG-9eb84c2-x86_64.AppImage
+
+If you have a Mac, run:
+
+    wget -c https://github.com/asl/BandageNG/releases/download/v2022.09/BandageNG.dmg
+    chmod +x BandageNG.dmg
 
 Then download the graph on your computer by executing **locally on your computer**:
 
     USER="PUT HERE YOUR USER NAME ON ILIFU"
     scp $USER@slurm.ilifu.ac.za:/cbio/projects/031/$USER/ref_based_pangenome_graph_building/tiny.gfa ~/Desktop
 
-and try to visualize it **locally on your computer** with:
+and try to visualize it **locally on your computer**.
 
-    ./BandageNG-9eb84c2-x86_64.AppImage load ~/Desktop/tiny.gfa 
+If you have a Linux, run:
+
+    ./BandageNG-9eb84c2-x86_64.AppImage load ~/Desktop/tiny.gfa
+
+If you have a Mac, run:
+
+    ./BandageNG.dmg load ~/Desktop/tiny.gfa
 
 Click the `Drawn graph` button to visualize the graph.
 Click the `Length Node` button under Node labels feature.
@@ -111,7 +124,7 @@ Now `Bandage` should show correctly the paths traversing the selected node.
 Never trust the tools!
 </details>
 
-Try to generate a PNG image with `Bandage` (take a look at the `BandageNG-9eb84c2-x86_64.AppImage -h` output).
+Try to generate a PNG image with `Bandage` (take a look at the `BandageNG-9eb84c2-x86_64.AppImage -h` / `BandageNG.dmg -h` output).
 This can be helpful to take at graphs that are too big to be directly loaded with `Bandage`.
 
 Now, let's build a new complex graph.
