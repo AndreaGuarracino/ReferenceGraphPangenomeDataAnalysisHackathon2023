@@ -240,6 +240,8 @@ Check that everything went fine:
 Build the pangenome graph for chromosome 20.
 **For running this, go to the second terminal you've opened:**
 
+    module load pggb
+
     DIR_BASE=/cbio/projects/031/$USER
     mkdir -p $DIR_BASE/human_pangenome_graphs/graphs
     cd $DIR_BASE/human_pangenome_graphs/graphs
