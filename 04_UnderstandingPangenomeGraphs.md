@@ -33,14 +33,17 @@ Now create a directory to work on for this tutorial:
 ### MHC locus
 
 Download the HPRC pangenome graph of the human chromosome 6 in GFA format, decompress it, and convert it to a graph in `odgi` format.
-Run this job with SLURM.
+**For running this, open a new terminal (do not close the current one), login again and then run:**
+
+    module load pggb
+    module load htslib
 
     DIR_BASE=/cbio/projects/031/$USER
     cd $DIR_BASE/understanding_pan_graphs
     wget https://s3-us-west-2.amazonaws.com/human-pangenomics/pangenomes/scratch/2021_11_16_pggb_wgg.88/chroms/chr6.pan.fa.a2fb268.4030258.6a1ecc2.smooth.gfa.gz
     gunzip chr6.pan.fa.a2fb268.4030258.6a1ecc2.smooth.gfa.gz
 
-    srun -c16 -p main "odgi build -g $DIR_BASE/understanding_pan_graphs/chr6.pan.fa.a2fb268.4030258.6a1ecc2.smooth.gfa -o $DIR_BASE/understanding_pan_graphs/chr6.pan.og -t 16 -P"
+    sbatch -c16 -p Main --wrap "odgi build -g $DIR_BASE/understanding_pan_graphs/chr6.pan.fa.a2fb268.4030258.6a1ecc2.smooth.gfa -o $DIR_BASE/understanding_pan_graphs/chr6.pan.og -t 16 -P"
 
 This graph contains contigs of 88 haploid, phased human genome assemblies from 44 individuals, plus the `chm13` and `grch38` reference genomes.
 
@@ -50,7 +53,8 @@ The [major histocompatibility complex (MHC)](https://en.wikipedia.org/wiki/Major
 In humans, the MHC region occurs on chromosome 6.
 The human MHC is also called the HLA (human leukocyte antigen) complex (often just the HLA).
 
-To see the coordinates of some HLA genes, execute:
+See the coordinates of some HLA genes.
+**For running this, return to the first terminal you've opened:**
 
     DIR_BASE=/cbio/projects/031/$USER
     cd $DIR_BASE/understanding_pan_graphs
@@ -64,8 +68,7 @@ To extract the subgraph containing all the HLA genes annotated in the `chr6.HLA_
     cd $DIR_BASE/understanding_pan_graphs
     bedtools merge -i test/chr6.HLA_genes.bed -d 10000000 > chr6.interval_to_extract.bed
 
-and then we execute (use SLURM to run this job):
-
+and then **go to the second terminal you've opened and execute:**
     DIR_BASE=/cbio/projects/031/$USER
     cd $DIR_BASE/understanding_pan_graphs
     srun -c16 -p main "odgi extract -i $DIR_BASE/understanding_pan_graphs/chr6.pan.og -o $DIR_BASE/understanding_pan_graphs/chr6.pan.MHC.og -b $DIR_BASE/understanding_pan_graphs/chr6.interval_to_extract.bed -O -t 16 -P"

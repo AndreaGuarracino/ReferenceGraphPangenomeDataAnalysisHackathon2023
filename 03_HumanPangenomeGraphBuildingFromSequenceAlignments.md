@@ -91,7 +91,11 @@ For doing that, we first need to put the two reference genomes together
     cd $DIR_BASE/human_pangenome_graphs/assemblies
     zcat chm13.fa.gz grch38.fa.gz | bgzip -@ 16 > chm13+grch38.fa.gz && samtools faidx chm13+grch38.fa.gz
 
-and then map each assembly against the two reference genomes (use SLURM for these jobs):
+and then map each assembly against the two reference genomes.
+**For running this, open a new terminal (do not close the current one), login again and then run:**
+
+    module load pggb
+    module load htslib
 
     DIR_BASE=/cbio/projects/031/$USER
     cd $DIR_BASE/human_pangenome_graphs
@@ -105,7 +109,7 @@ and then map each assembly against the two reference genomes (use SLURM for thes
       echo $NAME
 
       PATH_PAF=$DIR_BASE/human_pangenome_graphs/assemblies/partitioning/$NAME.vs.ref.paf
-      srun -c32 -p main "wfmash $PATH_REFERENCES_FASTA $FASTA -m -N -t 32 > $PATH_PAF"
+      sbatch -c32 -p Main --wrap "wfmash $PATH_REFERENCES_FASTA $FASTA -m -N -t 32 > $PATH_PAF"
     done
 
 `wfmash` should take 4-5 minutes for each haplotype (each FASTA file).
@@ -162,7 +166,8 @@ In GRCh38 the shor arms of the acrocentric chromosomes (chromosome 13, 14, 15, 2
 These short arms are available in CHM13 and indeed we are able to map lots of contigs against them.
 </details>
 
-It should be noted that also with `wfmash -N`, there can be cases with contigs fully mapping to different cromosomes. For example:
+It should be noted that also with `wfmash -N`, there can be cases with contigs fully mapping to different cromosomes.
+For example:
 
     DIR_BASE=/cbio/projects/031/$USER
     cd $DIR_BASE/human_pangenome_graphs
@@ -206,7 +211,8 @@ Now we can subset assembly contigs by chromosome:
     done
 
 Then, we create a FASTA file for each chromosome, reference chromosomes included.
-To save time and space, let's take only sequences from chromosome 20:
+To save time and space, let's take only sequences from chromosome 20.
+**For running this, return to the first terminal you've opened:**
 
     DIR_BASE=/cbio/projects/031/$USER
     ( echo 20 ) | while read i; do
@@ -231,13 +237,14 @@ Check that everything went fine:
 
 ### Building chromosome-specific pangenome graphs
 
-Build the pangenome graph for chromosome 20 (use SLURM for this job).
+Build the pangenome graph for chromosome 20.
+**For running this, go to the second terminal you've opened:**
 
     DIR_BASE=/cbio/projects/031/$USER
     mkdir -p $DIR_BASE/human_pangenome_graphs/graphs
     cd $DIR_BASE/human_pangenome_graphs/graphs
 
-    srun -c32 -p main "pggb -i $DIR_BASE/human_pangenome_graphs/assemblies/partitioning/chr20.fa.gz -o $DIR_BASE/human_pangenome_graphs/graphs/pggb.chr20 -p 98 -s 10k -k 79 -V 'chm13:1000,grch38:1000' -D /scratch3/users/$USER -t 32"
+    sbatch -c32 -p Main --wrap "pggb -i $DIR_BASE/human_pangenome_graphs/assemblies/partitioning/chr20.fa.gz -o $DIR_BASE/human_pangenome_graphs/graphs/pggb.chr20 -p 98 -s 10k -k 79 -V 'chm13:1000,grch38:1000' -D /scratch3/users/$USER -t 32"
 
 This should take approximately 1 hour and will generate a pangenome graph, several graph visualizations, and 2 variant sets called from the assemblies.
 
