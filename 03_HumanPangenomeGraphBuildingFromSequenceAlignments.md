@@ -171,7 +171,7 @@ For example:
 
     DIR_BASE=/cbio/projects/031/$USER
     cd $DIR_BASE/human_pangenome_graphs
-    grep 'HG00438#2#JAHBCA010000147.1' *paf
+    grep 'HG00438#2#JAHBCA010000147.1' $DIR_BASE/human_pangenome_graphs/assemblies/partitioning/*paf
 
 HG00438.maternal.f1_assembly_v2_genbank.vs.ref.paf:HG00438#2#JAHBCA010000147.1  738336  0       738336  +       chm13#1#chr13 113566686       8582789 9321125 245     738336  23      id:f:99.4899    kc:f:0.057824
 HG00438.maternal.f1_assembly_v2_genbank.vs.ref.paf:HG00438#2#JAHBCA010000147.1  738336  0       738336  +       chm13#1#chr22 51324926        5299094 6037430 245     738336  23      id:f:99.4899    kc:f:0.057824
