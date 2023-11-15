@@ -244,7 +244,7 @@ Build the pangenome graph for chromosome 20.
     mkdir -p $DIR_BASE/human_pangenome_graphs/graphs
     cd $DIR_BASE/human_pangenome_graphs/graphs
 
-    sbatch -c32 -p Main --wrap "pggb -i $DIR_BASE/human_pangenome_graphs/assemblies/partitioning/chr20.fa.gz -o $DIR_BASE/human_pangenome_graphs/graphs/pggb.chr20 -p 98 -s 10k -k 79 -V 'chm13:1000,grch38:1000' -D /scratch3/users/$USER -t 32"
+    sbatch -c32 -p Main --wrap "pggb -i $DIR_BASE/human_pangenome_graphs/assemblies/partitioning/chr20.fa.gz -o $DIR_BASE/human_pangenome_graphs/graphs/pggb.chr20 -p 98 -s 10k -k 79 -V 'chm13:1000,grch38:1000' -D /scratch3/users/$USER/pggb.chr20 -t 32"
 
 This should take approximately 1 hour and will generate a pangenome graph, several graph visualizations, and 2 variant sets called from the assemblies.
 
