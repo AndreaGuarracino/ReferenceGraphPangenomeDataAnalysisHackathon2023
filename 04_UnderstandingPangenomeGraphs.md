@@ -12,7 +12,7 @@
 
 Ask for interactive session (let's ask for a bit more CPUs this round):
 
-    srun --nodes=1 -c32 --mem=8g --time 24:00:00 --job-name "interactive_small" --pty /bin/bash
+    srun --nodes=1 -c32 --mem=32g --time 24:00:00 --job-name "interactive_small" --pty /bin/bash
 
 Make sure you have `pggb` and its tools loaded:
 
