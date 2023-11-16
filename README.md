@@ -19,3 +19,4 @@ The event was sponsored by [H3ABioNet](https://www.h3abionet.org/).
   * [Graph extraction](04_UnderstandingPangenomeGraphs.md#graph-extraction)
   * [Graph untangling](04_UnderstandingPangenomeGraphs.md#graph-untangling)
   * [Annotation injection](04_UnderstandingPangenomeGraphs.md#annotation-injection)
+* [Hacking with our data](05_HackingWithOurData.md)
