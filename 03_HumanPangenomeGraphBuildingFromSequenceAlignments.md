@@ -246,7 +246,7 @@ Build the pangenome graph for chromosome 20.
     mkdir -p $DIR_BASE/human_pangenome_graphs/graphs
     cd $DIR_BASE/human_pangenome_graphs/graphs
 
-    sbatch -c32 -p Main --wrap "pggb -i $DIR_BASE/human_pangenome_graphs/assemblies/partitioning/chr20.fa.gz -o $DIR_BASE/human_pangenome_graphs/graphs/pggb.chr20 -p 98 -s 10k -k 79 -V 'chm13:1000,grch38:1000' -D /scratch3/users/$USER/pggb.chr20 -t 32"
+    sbatch -c32 -p Main --wrap "pggb -i $DIR_BASE/human_pangenome_graphs/assemblies/partitioning/chr20.fa.gz -o $DIR_BASE/human_pangenome_graphs/graphs/pggb.chr20 -p 98 -s 10k -k 79 -V 'chm13,grch38' -D /scratch3/users/$USER/pggb.chr20 -t 32"
 
 This should take approximately 1 hour and will generate a pangenome graph, several graph visualizations, and 2 variant sets called from the assemblies.
 
@@ -283,10 +283,8 @@ With human data, higher values work well.
 <details>
   <summary>Click me for considerations about the `-V` parameter</summary>
 
-The `-V 'chm13:1000,grch38:1000'` parameter specifies to call variants from the assemblies using two different genomes as reference.
+The `-V 'chm13,grch38'` parameter specifies to call variants from the assemblies using two different genomes as reference.
 This will generate two VCF files: in one the variants will be expressed relative to CHM13, in the other the variants will be expressed relative to GRCh38.
-The `1000` valye specifies to decompose the variants, filtering sites whose max allele length is greater than 1000 bps.
-We keep this value low here to save time, but you can consider specifying higher values such as 10000 or 100000, but this will significantly increase the VCF normalization time.
 </details>
 
 Use `odgi stats` to obtain the graph length, and the number of nodes, edges, and paths.
