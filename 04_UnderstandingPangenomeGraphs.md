@@ -69,9 +69,10 @@ To extract the subgraph containing all the HLA genes annotated in the `chr6.HLA_
     bedtools merge -i test/chr6.HLA_genes.bed -d 10000000 > chr6.interval_to_extract.bed
 
 and then **go to the second terminal you've opened and execute:**
+
     DIR_BASE=/cbio/projects/031/$USER
     cd $DIR_BASE/understanding_pan_graphs
-    srun -c16 -p main "odgi extract -i $DIR_BASE/understanding_pan_graphs/chr6.pan.og -o $DIR_BASE/understanding_pan_graphs/chr6.pan.MHC.og -b $DIR_BASE/understanding_pan_graphs/chr6.interval_to_extract.bed -O -t 16 -P"
+    sbatch -c32 -p Main --wrap "odgi extract -i $DIR_BASE/understanding_pan_graphs/chr6.pan.og -o $DIR_BASE/understanding_pan_graphs/chr6.pan.MHC.og -b $DIR_BASE/understanding_pan_graphs/chr6.interval_to_extract.bed -O -t 16 -P"
 
 The instruction extracts:
 
