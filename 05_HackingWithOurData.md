@@ -2,7 +2,10 @@
 
 ## Understanding H3ABioNet pangenome graphs
 
-### Chromosome 6 pangenome graph (6 diploid samples)
+You can find the `pggb` graphs for all chromosomes here: `/cbio/projects/031/andreaguarracino/6samples`.
+Each graph was made with 6 diploid samples (so 12 haplotypes) plus 2 reference genomes (`GRCh38` and `CHM13`).
+
+### Chromosome 6 pangenome graph
 
 We extract the MHC locus and color bars by haplotype.
  
