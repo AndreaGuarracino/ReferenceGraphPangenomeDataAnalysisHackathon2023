@@ -62,6 +62,9 @@ chm13#1#chr20   553892  <338912<338910  CT   C    60    .       AC=9;AF=0.692308
 ##contig=<ID=grch38#1#chr20,length=64444167>
 #CHROM          POS     ID              REF  ALT  QUAL  FILTER  INFO                                                                      FORMAT  AB2563  CMI0Q  CQD0R  EFB0A  FPM0J  FPV0R  chm13
 grch38#1#chr20  510173  <338912<338910  C    CT   60    .       AC=5;AF=0.384615;AN=13;AT=>338910>338912,>338910>338911>338912;NS=7;LV=0  GT      1|0     0|0    1|1    0|0    0|0    0|1    1
+
+#CHROM               POS     ID              REF  ALT  QUAL  FILTER  INFO                                                                      FORMAT  AB2563  CMI0Q  CQD0R  EFB0A  FPM0J  chm13  grch38
+FPV0R#1#h1tg000005l  546533  <338912<338910  C    CT   60    .       AC=4;AF=0.333333;AN=12;AT=>338910>338912,>338910>338911>338912;NS=7;LV=0  GT      1|0     0|0    1|1    0|0    0|0    1      0
 ```
 
 ![chr20 bubble Bandage](images/6samples.littleBubble.Bandage.chr20.png)
