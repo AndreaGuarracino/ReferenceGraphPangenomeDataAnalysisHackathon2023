@@ -78,3 +78,7 @@ We extract the MHC locus and color bars by haplotype.
 
 ![chr6 MHC locus](images/chr6.pan.MHC.46.png)
 ![chr6 MHC locus](images/chr6.pan.MHC.hack.png)
+
+There are suspicious "indels". Let's try a local `pggb` run:
+
+![chr6 MHC locus](images/chr6.pan.MHC.hack.2.png)
