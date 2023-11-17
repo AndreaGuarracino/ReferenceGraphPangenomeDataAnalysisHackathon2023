@@ -55,11 +55,11 @@ The same variant can be expressed differently into a VCF file with respect to th
 ##INFO=<ID=PS,Number=1,Type=String,Description="ID of variant corresponding to parent snarl">
 ##INFO=<ID=AT,Number=R,Type=String,Description="Allele Traversal as path in graph">
 
-##contig=<ID=grch38#1#chr20,length=64444167>
+##contig=<ID=chm13#1#chr20,length=66210255>
 #CHROM          POS     ID              REF  ALT  QUAL  FILTER  INFO                                                                      FORMAT  AB2563  CMI0Q  CQD0R  EFB0A  FPM0J  FPV0R  grch38
 chm13#1#chr20   553892  <338912<338910  CT   C    60    .       AC=9;AF=0.692308;AN=13;AT=>338910>338911>338912,>338910>338912;NS=7;LV=0  GT      0|1     1|1    0|0    1|1    1|1    1|0    1
 
-##contig=<ID=chm13#1#chr20,length=66210255>
+##contig=<ID=grch38#1#chr20,length=64444167>
 #CHROM          POS     ID              REF  ALT  QUAL  FILTER  INFO                                                                      FORMAT  AB2563  CMI0Q  CQD0R  EFB0A  FPM0J  FPV0R  chm13
 grch38#1#chr20  510173  <338912<338910  C    CT   60    .       AC=5;AF=0.384615;AN=13;AT=>338910>338912,>338910>338911>338912;NS=7;LV=0  GT      1|0     0|0    1|1    0|0    0|0    0|1    1
 ```
